@@ -8,16 +8,11 @@ describe('txs-trace-machine', () => {
 				txTraceMachine.withContext({
 					...txTraceMachine.context,
 				}),
-			)
-				.onTransition(state => {
-					console.log(state.value);
-					if (state.matches('pending_subscription')) {
-						done();
-					}
-				})
-				.onEvent(event => {
-					console.log(event.type);
-				});
+			).onTransition(state => {
+				if (state.matches('pending_subscription')) {
+					done();
+				}
+			});
 
 			fetchService.start();
 
@@ -29,18 +24,47 @@ describe('txs-trace-machine', () => {
 		}));
 
 	test(
-		'should eventually reach "results"',
+		'should eventually reach "result" from pending_subscription',
 		() =>
 			new Promise<void>(done => {
 				const fetchService = interpret(
 					txTraceMachine.withContext({
 						...txTraceMachine.context,
-						subscribeTimeout: 1000,
+						subscribeTimeout: 20000,
 						query: "message.action='/osmosis.gamm.v1beta1.MsgSwapExactAmountIn'",
 					}),
 				).onTransition(state => {
-					if (state.matches('results')) {
-						console.log(state.context.txs);
+					console.log(state.value);
+					if (state.matches('result')) {
+						done();
+					}
+				});
+
+				fetchService.start();
+
+				/*
+				 *  Send zero or more events to the service that should
+				 *  cause it to eventually reach its expected state
+				 */
+				fetchService.send({ type: 'TRACE' });
+			}),
+		{
+			timeout: 30_000,
+		},
+	);
+
+	test(
+		'should eventually reach "result" from pending_search_txs',
+		() =>
+			new Promise<void>(done => {
+				const fetchService = interpret(
+					txTraceMachine.withContext({
+						...txTraceMachine.context,
+						subscribeTimeout: 5_000,
+						query: "acknowledge_packet.packet_sequence='1777404'",
+					}),
+				).onTransition(state => {
+					if (state.matches('result')) {
 						done();
 					}
 				});
