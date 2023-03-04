@@ -1,4 +1,5 @@
-import { createMachine } from 'xstate';
+import { createMachine, raise } from 'xstate';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { TxTraceContext } from '../../types';
 
 export const txTraceMachine = createMachine(
@@ -8,28 +9,23 @@ export const txTraceMachine = createMachine(
 			open_connection: {
 				invoke: {
 					id: 'openWebsocketConnection',
-					src: ctx => callback => {
+					src: ctx => async callback => {
 						try {
-							ctx.socketClient = new WebSocket(ctx.websocketUrl);
+							ctx.tendermintClient = await Tendermint34Client.connect(
+								ctx.websocketUrl,
+							);
 
-							const connectedHandler = () => callback('CONNECTION_SUCCESS');
-							ctx.socketClient.addEventListener('open', connectedHandler);
-
-							return () => {
-								ctx.socketClient?.removeEventListener('open', connectedHandler);
-							};
+							callback('CONNECTION_SUCCESS');
 						} catch (err) {
+							console.log(err);
 							callback('CONNECTION_ERROR');
 						}
-
-						return () => {
-							ctx.socketClient = undefined;
-						};
 					},
 				},
 				on: {
 					CONNECTION_SUCCESS: {
 						target: 'connected',
+						actions: raise('SEND_QUERY_MESSAGE'),
 					},
 					CONNECTION_ERROR: {
 						target: 'closed',
@@ -59,9 +55,7 @@ export const txTraceMachine = createMachine(
 			},
 			connected: {
 				on: {
-					SEND_QUERY_MESSAGE: {
-						target: 'pending',
-					},
+					SEND_QUERY_MESSAGE: { target: 'pending' },
 				},
 			},
 			closed: {
@@ -93,10 +87,10 @@ export const txTraceMachine = createMachine(
 				| { type: 'TX_SEARCH_EMPTY' },
 		},
 		context: {
-			socketClient: undefined,
+			tendermintClient: undefined,
 			txTimeout: 5000,
 			connectionTimeout: 5000,
-			websocketUrl: 'wss://rpc-osmosis.blockapsis.com/websocket',
+			websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
 			query: "acknowledge_packet.packet_sequence='1753590'",
 			method: 'tx_search',
 		},

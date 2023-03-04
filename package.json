@@ -5,6 +5,8 @@
   "scripts": {},
   "private": true,
   "dependencies": {
+    "@cosmjs/stargate": "^0.29.5",
+    "@cosmjs/tendermint-rpc": "^0.29.5",
     "xstate": "^4.37.0"
   },
   "devDependencies": {

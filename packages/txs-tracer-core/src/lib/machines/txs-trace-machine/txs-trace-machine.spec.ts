@@ -1,10 +1,10 @@
 import { interpret } from 'xstate';
 import { txTraceMachine } from './txs-trace-machine';
 
-test('should eventually reach "connected"', () =>
+test('should eventually reach "pending"', () =>
 	new Promise<void>(done => {
 		const fetchService = interpret(txTraceMachine).onTransition(state => {
-			if (state.matches('connected')) {
+			if (state.matches('pending')) {
 				done();
 			}
 		});

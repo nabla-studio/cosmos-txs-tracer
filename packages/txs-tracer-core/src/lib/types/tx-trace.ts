@@ -1,8 +1,10 @@
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+
 export interface TxTraceContext {
 	txTimeout: number;
 	connectionTimeout: number;
 	websocketUrl: string;
 	query: string;
 	method: string;
-	socketClient?: WebSocket;
+	tendermintClient?: Tendermint34Client;
 }
