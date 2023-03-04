@@ -1,17 +1,29 @@
 import styled from '@emotion/styled';
 
-import NxWelcome from './nx-welcome';
-
 import { Route, Routes, Link } from 'react-router-dom';
+import { useMachine } from '@xstate/react';
+import { txTraceMachine } from '@nabla-studio/txs-tracer-core'
+import { useEffect } from 'react';
 
 const StyledApp = styled.div`
 	// Your style here
 `;
 
 export function App() {
+	const [state, send] = useMachine(txTraceMachine, {
+		context: {
+			...txTraceMachine.context,
+			subscribeTimeout: 10_000,
+			query: "message.action='/osmosis.gamm.v1beta1.MsgSwapExactAmountIn'"
+		},
+	});
+
+	console.log(state.context.txs);
+
 	return (
 		<StyledApp>
-			<NxWelcome title="demo-app" />
+			<p>{state.value.toString()}</p>
+			<button onClick={() => send({ type: 'TRACE' })}>Trace</button>
 
 			{/* START: routes */}
 			{/* These routes and navigation have been generated for you */}
