@@ -5,9 +5,11 @@
   "scripts": {},
   "private": true,
   "dependencies": {
+    "@cosmjs/encoding": "^0.29.5",
     "@cosmjs/stargate": "^0.29.5",
     "@cosmjs/tendermint-rpc": "^0.29.5",
-    "xstate": "^4.37.0"
+    "xstate": "^4.37.0",
+    "xstream": "^11.14.0"
   },
   "devDependencies": {
     "@nrwl/eslint-plugin-nx": "15.7.2",

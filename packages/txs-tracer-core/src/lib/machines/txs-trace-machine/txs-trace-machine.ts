@@ -1,6 +1,8 @@
 import { createMachine, raise } from 'xstate';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { TxTraceContext } from '../../types';
+import { Tendermint34Client, TxEvent } from '@cosmjs/tendermint-rpc';
+import { Listener, Stream } from 'xstream';
+import { TxTraceContext, TxTraceEvents } from '../../types';
+import { mapIndexedTx } from '../../utils';
 
 export const txTraceMachine = createMachine(
 	{
@@ -37,12 +39,7 @@ export const txTraceMachine = createMachine(
 					},
 				},
 			},
-			pending: {
-				after: {
-					TX_TIMEOUT: {
-						target: 'pending',
-					},
-				},
+			pending_search_txs: {
 				on: {
 					TX_RESULTS: {
 						target: 'result',
@@ -55,39 +52,50 @@ export const txTraceMachine = createMachine(
 					},
 				},
 			},
+			pending_subscription: {
+				entry: ['subscribeToQuery'],
+				after: {
+					SUBSCRIBE_TIMEOUT: {
+						target: 'pending_search_txs',
+					},
+				},
+				on: {
+					TX_RESULTS: {
+						target: 'result',
+					},
+					CONNECTION_DISCONNECT: {
+						target: 'connection_error',
+					},
+				},
+			},
 			result: {
 				type: 'final',
+				data: (ctx, event) => ({
+					event,
+					txs: ctx.txs,
+				}),
+				entry: ['closeConnection'],
 			},
 			connected: {
 				on: {
-					SEND_QUERY_MESSAGE: { target: 'pending' },
+					SEND_QUERY_MESSAGE: { target: 'pending_subscription' },
 				},
 			},
 			closed: {
 				type: 'final',
-				entry: ctx => {
-					if (ctx.tendermintClient) {
-						ctx.tendermintClient.disconnect();
-
-						ctx.tendermintClient = undefined;
-					}
-				},
+				entry: ['closeConnection'],
 			},
 			connection_timeout: {
 				type: 'final',
-				entry: ctx => {
-					if (ctx.tendermintClient) {
-						ctx.tendermintClient.disconnect();
-
-						ctx.tendermintClient = undefined;
-					}
-				},
+				entry: ['closeConnection'],
 			},
 			not_found_error: {
 				type: 'final',
+				entry: ['closeConnection'],
 			},
 			connection_error: {
 				type: 'final',
+				entry: ['closeConnection'],
 			},
 			idle: {
 				on: {
@@ -99,30 +107,55 @@ export const txTraceMachine = createMachine(
 		},
 		schema: {
 			context: {} as TxTraceContext,
-			events: {} as
-				| { type: 'TX_RESULTS' }
-				| { type: 'CONNECTION_SUCCESS' }
-				| { type: 'CONNECTION_ERROR' }
-				| { type: 'SEND_QUERY_MESSAGE' }
-				| { type: 'CONNECTION_DISCONNECT' }
-				| { type: 'TRACE' }
-				| { type: 'TX_SEARCH_EMPTY' },
+			events: {} as TxTraceEvents,
 		},
 		context: {
 			tendermintClient: undefined,
-			txTimeout: 5000,
+			subscribeTimeout: 5000,
 			connectionTimeout: 5000,
 			websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
-			query: "acknowledge_packet.packet_sequence='1753590'",
-			method: 'tx_search',
+			query: "acknowledge_packet.packet_sequence='1777404'",
+			txs: [],
 		},
 		predictableActionArguments: true,
 		preserveActionOrder: true,
 	},
 	{
+		actions: {
+			closeConnection: ctx => {
+				if (ctx.tendermintClient) {
+					ctx.tendermintClient.disconnect();
+
+					ctx.tendermintClient = undefined;
+				}
+			},
+			subscribeToQuery: ctx => {
+				let subscription: Stream<TxEvent>;
+				let listener: Listener<TxEvent>;
+
+				if (ctx.tendermintClient) {
+					subscription = ctx.tendermintClient.subscribeTx(ctx.query).take(1);
+
+					listener = {
+						next: txResult => {
+							ctx.txs = [mapIndexedTx(txResult)];
+						},
+						error: err => {
+							console.error(err);
+							raise('CONNECTION_DISCONNECT');
+						},
+						complete: () => {
+							raise('TX_RESULTS');
+						},
+					};
+
+					subscription.addListener(listener);
+				}
+			},
+		},
 		delays: {
-			TX_TIMEOUT: context => {
-				return context.txTimeout;
+			SUBSCRIBE_TIMEOUT: context => {
+				return context.subscribeTimeout;
 			},
 			CONNECTION_TIMEOUT: context => {
 				return context.connectionTimeout;
