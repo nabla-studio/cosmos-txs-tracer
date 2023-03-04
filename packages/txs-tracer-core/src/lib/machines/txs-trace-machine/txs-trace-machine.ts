@@ -1,8 +1,7 @@
-import { createMachine, raise } from 'xstate';
+import { assign, createMachine, DoneInvokeEvent, raise } from 'xstate';
 import { Tendermint34Client, TxEvent } from '@cosmjs/tendermint-rpc';
-import { Listener, Stream } from 'xstream';
 import { TxTraceContext, TxTraceEvents } from '../../types';
-import { mapIndexedTx } from '../../utils';
+import { mapIndexedTx, streamToPromise } from '../../utils';
 
 export const txTraceMachine = createMachine(
 	{
@@ -40,6 +39,7 @@ export const txTraceMachine = createMachine(
 				},
 			},
 			pending_search_txs: {
+				entry: ['searchTxsByQuery'],
 				on: {
 					TX_RESULTS: {
 						target: 'result',
@@ -53,7 +53,30 @@ export const txTraceMachine = createMachine(
 				},
 			},
 			pending_subscription: {
-				entry: ['subscribeToQuery'],
+				invoke: {
+					src: ctx => {
+						if (ctx.tendermintClient) {
+							return streamToPromise<TxEvent>(
+								ctx.tendermintClient.subscribeTx(ctx.query).take(1),
+							);
+						}
+
+						return new Promise((_, reject) => {
+							reject();
+						});
+					},
+					onDone: {
+						target: 'result',
+						actions: assign<
+							TxTraceContext,
+							DoneInvokeEvent<TxEvent>,
+							DoneInvokeEvent<TxEvent>
+						>({ txs: (_, event) => [mapIndexedTx(event.data)] }),
+					},
+					onError: {
+						target: 'connection_error',
+					},
+				},
 				after: {
 					SUBSCRIBE_TIMEOUT: {
 						target: 'pending_search_txs',
@@ -129,28 +152,8 @@ export const txTraceMachine = createMachine(
 					ctx.tendermintClient = undefined;
 				}
 			},
-			subscribeToQuery: ctx => {
-				let subscription: Stream<TxEvent>;
-				let listener: Listener<TxEvent>;
-
-				if (ctx.tendermintClient) {
-					subscription = ctx.tendermintClient.subscribeTx(ctx.query).take(1);
-
-					listener = {
-						next: txResult => {
-							ctx.txs = [mapIndexedTx(txResult)];
-						},
-						error: err => {
-							console.error(err);
-							raise('CONNECTION_DISCONNECT');
-						},
-						complete: () => {
-							raise('TX_RESULTS');
-						},
-					};
-
-					subscription.addListener(listener);
-				}
+			searchTxsByQuery: ctx => {
+				console.log('searchTxsByQuery: ', Date.now());
 			},
 		},
 		delays: {
