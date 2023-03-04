@@ -22,6 +22,11 @@ export const txTraceMachine = createMachine(
 						}
 					},
 				},
+				after: {
+					CONNECTION_TIMEOUT: {
+						target: 'connection_timeout',
+					},
+				},
 				on: {
 					CONNECTION_SUCCESS: {
 						target: 'connected',
@@ -59,6 +64,9 @@ export const txTraceMachine = createMachine(
 				},
 			},
 			closed: {
+				type: 'final',
+			},
+			connection_timeout: {
 				type: 'final',
 			},
 			not_found_error: {
@@ -101,6 +109,9 @@ export const txTraceMachine = createMachine(
 		delays: {
 			TX_TIMEOUT: context => {
 				return context.txTimeout;
+			},
+			CONNECTION_TIMEOUT: context => {
+				return context.connectionTimeout;
 			},
 		},
 	},
