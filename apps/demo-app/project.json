@@ -1,0 +1,72 @@
+{
+	"name": "demo-app",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "apps/demo-app/src",
+	"projectType": "application",
+	"targets": {
+		"build": {
+			"executor": "@nrwl/vite:build",
+			"outputs": ["{options.outputPath}"],
+			"defaultConfiguration": "production",
+			"options": {
+				"outputPath": "dist/apps/demo-app"
+			},
+			"configurations": {
+				"development": {
+					"mode": "development"
+				},
+				"production": {
+					"mode": "production"
+				}
+			}
+		},
+		"serve": {
+			"executor": "@nrwl/vite:dev-server",
+			"defaultConfiguration": "development",
+			"options": {
+				"buildTarget": "demo-app:build"
+			},
+			"configurations": {
+				"development": {
+					"buildTarget": "demo-app:build:development",
+					"hmr": true
+				},
+				"production": {
+					"buildTarget": "demo-app:build:production",
+					"hmr": false
+				}
+			}
+		},
+		"preview": {
+			"executor": "@nrwl/vite:preview-server",
+			"defaultConfiguration": "development",
+			"options": {
+				"buildTarget": "demo-app:build"
+			},
+			"configurations": {
+				"development": {
+					"buildTarget": "demo-app:build:development"
+				},
+				"production": {
+					"buildTarget": "demo-app:build:production"
+				}
+			}
+		},
+		"test": {
+			"executor": "@nrwl/vite:test",
+			"outputs": ["coverage/apps/demo-app"],
+			"options": {
+				"passWithNoTests": true,
+				"reportsDirectory": "../../coverage/apps/demo-app"
+			}
+		},
+		"lint": {
+			"executor": "@nrwl/linter:eslint",
+			"outputs": ["{options.outputFile}"],
+			"options": {
+				"lintFilePatterns": ["apps/demo-app/**/*.{ts,tsx,js,jsx}"]
+			}
+		}
+	},
+	"tags": []
+}

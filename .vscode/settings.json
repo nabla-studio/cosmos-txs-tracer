@@ -12,6 +12,7 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"conventionalCommits.scopes": [
-		"txs-tracer-core"
+		"txs-tracer-core",
+		"demo-app"
 	]
 }

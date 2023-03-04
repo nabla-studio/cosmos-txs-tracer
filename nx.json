@@ -1,43 +1,63 @@
 {
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "npmScope": "cosmos-txs-tracer",
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "@nrwl/nx-cloud",
-      "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"],
-        "accessToken": "ZDUxZGU5NmEtZTIyYS00NWRiLWJiZTItODFmYzIyNGQ0MjkwfHJlYWQtd3JpdGU="
-      }
-    }
-  },
-  "targetDefaults": {
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
-    },
-    "lint": {
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json",
-        "{workspaceRoot}/.eslintignore"
-      ]
-    },
-    "test": {
-      "inputs": ["default", "^production"]
-    }
-  },
-  "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "production": [
-      "default",
-      "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json"
-    ],
-    "sharedGlobals": []
-  },
-  "workspaceLayout": {
-    "appsDir": "packages",
-    "libsDir": "packages"
-  }
+	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+	"npmScope": "cosmos-txs-tracer",
+	"tasksRunnerOptions": {
+		"default": {
+			"runner": "@nrwl/nx-cloud",
+			"options": {
+				"cacheableOperations": ["build", "lint", "test", "e2e"],
+				"accessToken": "ZDUxZGU5NmEtZTIyYS00NWRiLWJiZTItODFmYzIyNGQ0MjkwfHJlYWQtd3JpdGU="
+			}
+		}
+	},
+	"targetDefaults": {
+		"build": {
+			"dependsOn": ["^build"],
+			"inputs": ["production", "^production"]
+		},
+		"lint": {
+			"inputs": [
+				"default",
+				"{workspaceRoot}/.eslintrc.json",
+				"{workspaceRoot}/.eslintignore"
+			]
+		},
+		"test": {
+			"inputs": ["default", "^production"]
+		},
+		"e2e": {
+			"inputs": ["default", "^production"]
+		}
+	},
+	"namedInputs": {
+		"default": ["{projectRoot}/**/*", "sharedGlobals"],
+		"production": [
+			"default",
+			"!{projectRoot}/.eslintrc.json",
+			"!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+			"!{projectRoot}/tsconfig.spec.json"
+		],
+		"sharedGlobals": []
+	},
+	"workspaceLayout": {
+		"appsDir": "apps",
+		"libsDir": "packages"
+	},
+	"generators": {
+		"@nrwl/react": {
+			"application": {
+				"style": "@emotion/styled",
+				"linter": "eslint",
+				"bundler": "vite",
+				"babel": true
+			},
+			"component": {
+				"style": "@emotion/styled"
+			},
+			"library": {
+				"style": "@emotion/styled",
+				"linter": "eslint"
+			}
+		}
+	}
 }
