@@ -65,9 +65,23 @@ export const txTraceMachine = createMachine(
 			},
 			closed: {
 				type: 'final',
+				entry: ctx => {
+					if (ctx.tendermintClient) {
+						ctx.tendermintClient.disconnect();
+
+						ctx.tendermintClient = undefined;
+					}
+				},
 			},
 			connection_timeout: {
 				type: 'final',
+				entry: ctx => {
+					if (ctx.tendermintClient) {
+						ctx.tendermintClient.disconnect();
+
+						ctx.tendermintClient = undefined;
+					}
+				},
 			},
 			not_found_error: {
 				type: 'final',
