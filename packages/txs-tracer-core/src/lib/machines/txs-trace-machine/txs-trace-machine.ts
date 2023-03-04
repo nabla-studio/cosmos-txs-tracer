@@ -1,5 +1,9 @@
 import { assign, createMachine, DoneInvokeEvent, raise } from 'xstate';
-import { Tendermint34Client, TxEvent } from '@cosmjs/tendermint-rpc';
+import {
+	Tendermint34Client,
+	TxEvent,
+	TxSearchResponse,
+} from '@cosmjs/tendermint-rpc';
 import { TxTraceContext, TxTraceEvents } from '../../types';
 import { mapIndexedTx, streamToPromise } from '../../utils';
 
@@ -39,16 +43,26 @@ export const txTraceMachine = createMachine(
 				},
 			},
 			pending_search_txs: {
-				entry: ['searchTxsByQuery'],
-				on: {
-					TX_RESULTS: {
+				invoke: {
+					src: ctx => {
+						if (ctx.tendermintClient) {
+							return ctx.tendermintClient.txSearchAll({ query: ctx.query });
+						}
+
+						return new Promise((_, reject) => {
+							reject();
+						});
+					},
+					onDone: {
 						target: 'result',
+						actions: assign<
+							TxTraceContext,
+							DoneInvokeEvent<TxSearchResponse>,
+							DoneInvokeEvent<TxSearchResponse>
+						>({ txs: (_, event) => event.data.txs.map(mapIndexedTx) }),
 					},
-					CONNECTION_DISCONNECT: {
+					onError: {
 						target: 'connection_error',
-					},
-					TX_SEARCH_EMPTY: {
-						target: 'not_found_error',
 					},
 				},
 			},
@@ -67,11 +81,12 @@ export const txTraceMachine = createMachine(
 					},
 					onDone: {
 						target: 'result',
-						actions: assign<
-							TxTraceContext,
-							DoneInvokeEvent<TxEvent>,
-							DoneInvokeEvent<TxEvent>
-						>({ txs: (_, event) => [mapIndexedTx(event.data)] }),
+						actions: () =>
+							assign<
+								TxTraceContext,
+								DoneInvokeEvent<TxEvent>,
+								DoneInvokeEvent<TxEvent>
+							>({ txs: (_, event) => [mapIndexedTx(event.data)] }),
 					},
 					onError: {
 						target: 'connection_error',
@@ -80,14 +95,6 @@ export const txTraceMachine = createMachine(
 				after: {
 					SUBSCRIBE_TIMEOUT: {
 						target: 'pending_search_txs',
-					},
-				},
-				on: {
-					TX_RESULTS: {
-						target: 'result',
-					},
-					CONNECTION_DISCONNECT: {
-						target: 'connection_error',
 					},
 				},
 			},
@@ -109,10 +116,6 @@ export const txTraceMachine = createMachine(
 				entry: ['closeConnection'],
 			},
 			connection_timeout: {
-				type: 'final',
-				entry: ['closeConnection'],
-			},
-			not_found_error: {
 				type: 'final',
 				entry: ['closeConnection'],
 			},
@@ -151,9 +154,6 @@ export const txTraceMachine = createMachine(
 
 					ctx.tendermintClient = undefined;
 				}
-			},
-			searchTxsByQuery: ctx => {
-				console.log('searchTxsByQuery: ', Date.now());
 			},
 		},
 		delays: {
