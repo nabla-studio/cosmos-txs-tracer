@@ -13,6 +13,7 @@
 	},
 	"conventionalCommits.scopes": [
 		"txs-tracer-core",
-		"demo-app"
+		"demo-app",
+		"demo-app-cosmos"
 	]
 }

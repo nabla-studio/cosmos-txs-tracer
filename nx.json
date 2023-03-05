@@ -23,7 +23,7 @@
 			]
 		},
 		"test": {
-			"inputs": ["default", "^production"]
+			"inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
 		},
 		"e2e": {
 			"inputs": ["default", "^production"]
@@ -35,9 +35,10 @@
 			"default",
 			"!{projectRoot}/.eslintrc.json",
 			"!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-			"!{projectRoot}/tsconfig.spec.json"
+			"!{projectRoot}/tsconfig.spec.json",
+			"!{projectRoot}/jest.config.[jt]s"
 		],
-		"sharedGlobals": []
+		"sharedGlobals": ["{workspaceRoot}/babel.config.json"]
 	},
 	"workspaceLayout": {
 		"appsDir": "apps",
@@ -55,6 +56,12 @@
 				"style": "@emotion/styled"
 			},
 			"library": {
+				"style": "@emotion/styled",
+				"linter": "eslint"
+			}
+		},
+		"@nrwl/next": {
+			"application": {
 				"style": "@emotion/styled",
 				"linter": "eslint"
 			}
