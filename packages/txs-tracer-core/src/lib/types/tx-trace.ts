@@ -10,11 +10,15 @@ export interface TxTraceContext {
 	tendermintClient?: Tendermint34Client;
 }
 
+export interface TxTraceEventPayload {
+	query: string;
+}
+
 export type TxTraceEvents =
 	| { type: 'TX_RESULTS' }
 	| { type: 'CONNECTION_SUCCESS' }
 	| { type: 'CONNECTION_ERROR' }
 	| { type: 'SEND_QUERY_MESSAGE' }
 	| { type: 'CONNECTION_DISCONNECT' }
-	| { type: 'TRACE' }
+	| { type: 'TRACE'; data: TxTraceEventPayload }
 	| { type: 'TX_SEARCH_EMPTY' };

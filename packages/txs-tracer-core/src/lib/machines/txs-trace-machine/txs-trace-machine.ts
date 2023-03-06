@@ -127,6 +127,7 @@ export const txTraceMachine = createMachine(
 				on: {
 					TRACE: {
 						target: 'open_connection',
+						actions: ['setTraceQuery'],
 					},
 				},
 			},
@@ -153,6 +154,11 @@ export const txTraceMachine = createMachine(
 					ctx.tendermintClient.disconnect();
 
 					ctx.tendermintClient = undefined;
+				}
+			},
+			setTraceQuery: (ctx, event) => {
+				if (event.type === 'TRACE' && event.data) {
+					ctx.query = event.data.query;
 				}
 			},
 		},
