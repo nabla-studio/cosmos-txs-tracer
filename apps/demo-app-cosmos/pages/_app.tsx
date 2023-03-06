@@ -36,9 +36,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         }}
         logLevel={"INFO"}
         wrappedWithChakra={true}
-        // modalViews={{
-        //   Connected: ConnectedView,
-        // }}
       >
         <Component {...pageProps} />
       </ChainProvider>

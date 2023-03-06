@@ -67,6 +67,7 @@ specifiers:
   jsdom: ~20.0.3
   next: ^13.2.3
   nx: 15.7.2
+  osmojs: 14.0.0-rc.0
   prettier: ^2.6.2
   react: 18.2.0
   react-dom: 18.2.0
@@ -113,6 +114,7 @@ dependencies:
   chain-registry: 1.9.0
   framer-motion: 10.0.1_biqbaboplfbrettd7655fr4n2y
   next: 13.2.3_6m24vuloj5ihw4zc5lbsktc4fu
+  osmojs: 14.0.0-rc.0
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-router-dom: 6.8.1_biqbaboplfbrettd7655fr4n2y
@@ -2783,6 +2785,15 @@ packages:
       protobufjs: 6.11.3
     dev: false
 
+  /@cosmjs/amino/0.29.3:
+    resolution: {integrity: sha512-BFz1++ERerIggiFc7iGHhGe1CeV3rCv8BvkoBQTBN/ZwzHOaKvqQj8smDlRGlQxX3HWlTwgiLN2A+OB5yX4ZRw==}
+    dependencies:
+      '@cosmjs/crypto': 0.29.5
+      '@cosmjs/encoding': 0.29.5
+      '@cosmjs/math': 0.29.5
+      '@cosmjs/utils': 0.29.5
+    dev: false
+
   /@cosmjs/amino/0.29.5:
     resolution: {integrity: sha512-Qo8jpC0BiziTSUqpkNatBcwtKNhCovUnFul9SlT/74JUCdLYaeG5hxr3q1cssQt++l4LvlcpF+OUXL48XjNjLw==}
     dependencies:
@@ -2845,6 +2856,18 @@ packages:
       bn.js: 5.2.1
     dev: false
 
+  /@cosmjs/proto-signing/0.29.3:
+    resolution: {integrity: sha512-Ai3l9THjMOrLJ4Ebn1Dgptwg6W5ZIRJqtnJjijHhGwTVC1WT0WdYU3aMZ7+PwubcA/cA1rH4ZTK7jrfYbra63g==}
+    dependencies:
+      '@cosmjs/amino': 0.29.5
+      '@cosmjs/crypto': 0.29.5
+      '@cosmjs/encoding': 0.29.5
+      '@cosmjs/math': 0.29.5
+      '@cosmjs/utils': 0.29.5
+      cosmjs-types: 0.5.2
+      long: 4.0.0
+    dev: false
+
   /@cosmjs/proto-signing/0.29.5:
     resolution: {integrity: sha512-QRrS7CiKaoETdgIqvi/7JC2qCwCR7lnWaUsTzh/XfRy3McLkEd+cXbKAW3cygykv7IN0VAEIhZd2lyIfT8KwNA==}
     dependencies:
@@ -2866,6 +2889,27 @@ packages:
       xstream: 11.14.0
     transitivePeerDependencies:
       - bufferutil
+      - utf-8-validate
+    dev: false
+
+  /@cosmjs/stargate/0.29.3:
+    resolution: {integrity: sha512-455TgXStCi6E8KDjnhDAM8wt6aLSjobH4Dixvd7Up1DfCH6UB9NkC/G0fMJANNcNXMaM4wSX14niTXwD1d31BA==}
+    dependencies:
+      '@confio/ics23': 0.6.8
+      '@cosmjs/amino': 0.29.5
+      '@cosmjs/encoding': 0.29.5
+      '@cosmjs/math': 0.29.5
+      '@cosmjs/proto-signing': 0.29.5
+      '@cosmjs/stream': 0.29.5
+      '@cosmjs/tendermint-rpc': 0.29.5
+      '@cosmjs/utils': 0.29.5
+      cosmjs-types: 0.5.2
+      long: 4.0.0
+      protobufjs: 6.11.3
+      xstream: 11.14.0
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
       - utf-8-validate
     dev: false
 
@@ -5094,6 +5138,15 @@ packages:
       - eslint
       - supports-color
       - typescript
+
+  /@osmonauts/lcd/0.8.0:
+    resolution: {integrity: sha512-k7m2gAVnXc0H4m/eTq4z/8A6hFrr3MPS9wnLV4Xu9/K/WYltCnp2PpiObZm+feZUPK/svES6hxIQeO1bODLx8g==}
+    dependencies:
+      '@babel/runtime': 7.21.0
+      axios: 0.27.2
+    transitivePeerDependencies:
+      - debug
+    dev: false
 
   /@parcel/watcher/2.0.4:
     resolution: {integrity: sha512-cTDi+FUDBIUOBKEtj+nhiJ71AZVlkAsQFuGQTun5tV9mwQBQgZvhCzG+URPQc8myeN32yRVZEfVAPCs1RW+Jvg==}
@@ -11299,6 +11352,10 @@ packages:
   /long/4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
 
+  /long/5.2.1:
+    resolution: {integrity: sha512-GKSNGeNAtw8IryjjkhZxuKB3JzlcLTwjtiQCHKvqQet81I93kXslhDQruGI/QsddO83mcDToBVy7GqGS/zYf/A==}
+    dev: false
+
   /loose-envify/1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
@@ -11965,6 +12022,23 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
       word-wrap: 1.2.3
+
+  /osmojs/14.0.0-rc.0:
+    resolution: {integrity: sha512-YXtg5mxaACWc0N8vKqWvdV3ZO9y/NgtJeUQPvjin+bkveEMkJA4RSN0nl0kRTKQIY6Tjt8YWgae+/98VF/2pzA==}
+    dependencies:
+      '@babel/runtime': 7.21.0
+      '@cosmjs/amino': 0.29.3
+      '@cosmjs/proto-signing': 0.29.3
+      '@cosmjs/stargate': 0.29.3
+      '@cosmjs/tendermint-rpc': 0.29.5
+      '@osmonauts/lcd': 0.8.0
+      long: 5.2.1
+      protobufjs: 6.11.3
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - utf-8-validate
+    dev: false
 
   /ospath/1.2.2:
     resolution: {integrity: sha512-o6E5qJV5zkAbIDNhGSIlyOhScKXgQrSRMilfph0clDfM0nEnBOlKlH4sWDmG95BW/CvwNz0vmm7dJVtU2KlMiA==}

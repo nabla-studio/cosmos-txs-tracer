@@ -23,7 +23,7 @@ export function App() {
 	return (
 		<StyledApp>
 			<p>{state.value.toString()}</p>
-			<button onClick={() => send({ type: 'TRACE' })}>Trace</button>
+			<button onClick={() => send({ type: "TRACE", data: { query: "message.action='/osmosis.gamm.v1beta1.MsgSwapExactAmountIn'" } })}>Trace</button>
 
 			{/* START: routes */}
 			{/* These routes and navigation have been generated for you */}
