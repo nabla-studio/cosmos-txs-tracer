@@ -127,7 +127,11 @@ export const txTraceMachine = createMachine(
 				on: {
 					TRACE: {
 						target: 'open_connection',
-						actions: ['setTraceQuery'],
+						actions: assign({
+							query: (_, event) => {
+								return event.data.query;
+							},
+						}),
 					},
 				},
 			},
@@ -141,7 +145,7 @@ export const txTraceMachine = createMachine(
 			subscribeTimeout: 5000,
 			connectionTimeout: 5000,
 			websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
-			query: "acknowledge_packet.packet_sequence='1777404'",
+			query: '',
 			txs: [],
 		},
 		predictableActionArguments: true,
@@ -154,11 +158,6 @@ export const txTraceMachine = createMachine(
 					ctx.tendermintClient.disconnect();
 
 					ctx.tendermintClient = undefined;
-				}
-			},
-			setTraceQuery: (ctx, event) => {
-				if (event.type === 'TRACE' && event.data) {
-					ctx.query = event.data.query;
 				}
 			},
 		},
