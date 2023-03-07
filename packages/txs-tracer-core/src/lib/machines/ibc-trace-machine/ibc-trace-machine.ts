@@ -186,7 +186,7 @@ export const ibcTraceMachine = createMachine(
 				},
 			},
 			complete: {
-				entry: ['increateStep'],
+				entry: ['increaseStep'],
 				type: 'final',
 			},
 			error: {
