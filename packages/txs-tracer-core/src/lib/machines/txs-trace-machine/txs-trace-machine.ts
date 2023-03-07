@@ -143,8 +143,8 @@ export const txTraceMachine = createMachine(
 		},
 		context: {
 			tendermintClient: undefined,
-			subscribeTimeout: 5000,
-			connectionTimeout: 5000,
+			subscribeTimeout: 60_000,
+			connectionTimeout: 10_000,
 			websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
 			query: '',
 			txs: [],
