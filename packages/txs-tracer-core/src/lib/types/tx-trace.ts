@@ -12,6 +12,7 @@ export interface TxTraceContext {
 
 export interface TxTraceEventPayload {
 	query: string;
+	websocketUrl: string;
 }
 
 export type TxTraceEvents =

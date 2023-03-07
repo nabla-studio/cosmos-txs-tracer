@@ -21,7 +21,7 @@ export function Index() {
 			subscribeTimeout: 60_000,
 		},
 	});
-	const { username, address, connect, disconnect, wallet, getSigningStargateClient } = useChain("osmosis");
+	const { username, address, connect, disconnect, getRpcEndpoint, getSigningStargateClient } = useChain("osmosis");
   const { status: globalStatus } = useWallet();
 
 	const sendToken = useCallback(async () => {
@@ -62,9 +62,11 @@ export function Index() {
 
 		const transactionId = toHex(broadcasted.hash).toUpperCase();
 		console.log(transactionId);
+		
+		const rpc = await getRpcEndpoint();
 
-		sendMachine({ type: 'TRACE', data: { query: `tx.hash='${transactionId}'` } })
-	}, [getSigningStargateClient, sendMachine, address])
+		sendMachine({ type: 'TRACE', data: { query: `tx.hash='${transactionId}'`, websocketUrl: rpc.replace('https', 'wss') } })
+	}, [getSigningStargateClient, getRpcEndpoint, sendMachine, address])
 
 	console.log(state.value.toString(), state.context.txs)
 
