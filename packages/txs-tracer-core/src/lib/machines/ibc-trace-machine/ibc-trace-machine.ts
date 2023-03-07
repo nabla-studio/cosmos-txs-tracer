@@ -58,7 +58,8 @@ export const ibcTraceMachine = createMachine(
 									return (
 										event.data.state === TxTraceFinalState.Result &&
 										event.data.txs !== undefined &&
-										event.data.txs.length > 0
+										event.data.txs.length > 0 &&
+										event.data.txs[0].code === 0
 									);
 								},
 								actions: raise<
@@ -77,6 +78,10 @@ export const ibcTraceMachine = createMachine(
 									type: 'ON_ERROR',
 									data: {
 										state: event.data.state,
+										code:
+											event.data.txs && event.data.txs.length > 0
+												? event.data.txs[0].code
+												: -1,
 									},
 								})),
 							},
@@ -101,6 +106,11 @@ export const ibcTraceMachine = createMachine(
 					},
 					ON_ERROR: {
 						target: 'error',
+						actions: assign({
+							errorCode: (_, event) => {
+								return event.data.code;
+							},
+						}),
 					},
 				},
 			},
@@ -136,6 +146,10 @@ export const ibcTraceMachine = createMachine(
 									type: 'ON_ERROR',
 									data: {
 										state: event.data.state,
+										code:
+											event.data.txs && event.data.txs.length > 0
+												? event.data.txs[0].code
+												: -1,
 									},
 								})),
 							},
@@ -182,6 +196,11 @@ export const ibcTraceMachine = createMachine(
 					},
 					ON_ERROR: {
 						target: 'error',
+						actions: assign({
+							errorCode: (_, event) => {
+								return event.data.code;
+							},
+						}),
 					},
 				},
 			},
@@ -203,6 +222,7 @@ export const ibcTraceMachine = createMachine(
 			websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
 			loading: false,
 			currentStep: 0,
+			errorCode: 0,
 			query: '',
 		},
 		predictableActionArguments: true,

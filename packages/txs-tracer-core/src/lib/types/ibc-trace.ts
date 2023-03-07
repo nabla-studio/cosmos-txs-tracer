@@ -11,12 +11,14 @@ export type IBCTraceContext = Omit<
 > & {
 	loading: boolean;
 	currentStep: number;
+	errorCode?: number;
 };
 
 export type IBCTraceEventPayload = TxTraceEventPayload;
 
 export type IBCMachineResultErrorPayload = {
 	type: TxTraceFinalStates;
+	code: number;
 };
 
 export type IBCTraceAckEventPayload = {
