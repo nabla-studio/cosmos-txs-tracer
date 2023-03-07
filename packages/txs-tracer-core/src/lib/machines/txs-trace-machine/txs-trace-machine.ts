@@ -4,7 +4,7 @@ import {
 	TxEvent,
 	TxSearchResponse,
 } from '@cosmjs/tendermint-rpc';
-import { TxTraceContext, TxTraceEvents } from '../../types';
+import { TxTraceContext, TxTraceEvents, TxTraceFinalState } from '../../types';
 import { mapIndexedTx, streamToPromise } from '../../utils';
 
 export const txTraceMachine = createMachine(
@@ -101,8 +101,8 @@ export const txTraceMachine = createMachine(
 			},
 			result: {
 				type: 'final',
-				data: (ctx, event) => ({
-					event,
+				data: ctx => ({
+					state: TxTraceFinalState.Result,
 					txs: ctx.txs,
 				}),
 				entry: ['closeConnection'],
@@ -114,14 +114,23 @@ export const txTraceMachine = createMachine(
 			},
 			closed: {
 				type: 'final',
+				data: () => ({
+					state: TxTraceFinalState.Closed,
+				}),
 				entry: ['closeConnection'],
 			},
 			connection_timeout: {
 				type: 'final',
+				data: () => ({
+					state: TxTraceFinalState.ConnectionTimeout,
+				}),
 				entry: ['closeConnection'],
 			},
 			connection_error: {
 				type: 'final',
+				data: () => ({
+					state: TxTraceFinalState.ConnectionError,
+				}),
 				entry: ['closeConnection'],
 			},
 			idle: {
