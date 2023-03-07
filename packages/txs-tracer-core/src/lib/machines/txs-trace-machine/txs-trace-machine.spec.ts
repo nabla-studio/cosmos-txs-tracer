@@ -20,7 +20,13 @@ describe('txs-trace-machine', () => {
 			 *  Send zero or more events to the service that should
 			 *  cause it to eventually reach its expected state
 			 */
-			fetchService.send({ type: 'TRACE' });
+			fetchService.send({
+				type: 'TRACE',
+				data: {
+					query: "message.action='/osmosis.gamm.v1beta1.MsgSwapExactAmountIn'",
+					websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
+				},
+			});
 		}));
 
 	test(
@@ -46,7 +52,13 @@ describe('txs-trace-machine', () => {
 				 *  Send zero or more events to the service that should
 				 *  cause it to eventually reach its expected state
 				 */
-				fetchService.send({ type: 'TRACE' });
+				fetchService.send({
+					type: 'TRACE',
+					data: {
+						query: "message.action='/osmosis.gamm.v1beta1.MsgSwapExactAmountIn'",
+						websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
+					},
+				});
 			}),
 		{
 			timeout: 30_000,
@@ -61,7 +73,6 @@ describe('txs-trace-machine', () => {
 					txTraceMachine.withContext({
 						...txTraceMachine.context,
 						subscribeTimeout: 5_000,
-						query: "acknowledge_packet.packet_sequence='1777404'",
 					}),
 				).onTransition(state => {
 					if (state.matches('result')) {
@@ -75,7 +86,13 @@ describe('txs-trace-machine', () => {
 				 *  Send zero or more events to the service that should
 				 *  cause it to eventually reach its expected state
 				 */
-				fetchService.send({ type: 'TRACE' });
+				fetchService.send({
+					type: 'TRACE',
+					data: {
+						query: 'acknowledge_packet.packet_sequence=1777404',
+						websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
+					},
+				});
 			}),
 		{
 			timeout: 30_000,
