@@ -81,12 +81,13 @@ export const txTraceMachine = createMachine(
 					},
 					onDone: {
 						target: 'result',
-						actions: () =>
-							assign<
-								TxTraceContext,
-								DoneInvokeEvent<TxEvent>,
-								DoneInvokeEvent<TxEvent>
-							>({ txs: (_, event) => [mapIndexedTx(event.data)] }),
+						actions: assign<
+							TxTraceContext,
+							DoneInvokeEvent<TxEvent>,
+							DoneInvokeEvent<TxEvent>
+						>({
+							txs: (_, event) => [mapIndexedTx(event.data)],
+						}),
 					},
 					onError: {
 						target: 'connection_error',
