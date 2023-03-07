@@ -132,6 +132,9 @@ export const txTraceMachine = createMachine(
 							query: (_, event) => {
 								return event.data.query;
 							},
+							websocketUrl: (_, event) => {
+								return event.data.websocketUrl;
+							},
 						}),
 					},
 				},
