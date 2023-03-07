@@ -18,7 +18,7 @@ export function Index() {
 	const [state, sendMachine] = useMachine(txTraceMachine, {
 		context: {
 			...txTraceMachine.context,
-			subscribeTimeout: 10_000,
+			subscribeTimeout: 60_000,
 		},
 	});
 	const { username, address, connect, disconnect, wallet, getSigningStargateClient } = useChain("osmosis");
@@ -65,6 +65,8 @@ export function Index() {
 
 		sendMachine({ type: 'TRACE', data: { query: `tx.hash='${transactionId}'` } })
 	}, [getSigningStargateClient, sendMachine, address])
+
+	console.log(state.value.toString(), state.context.txs)
 
 	/*
 	 * Replace the elements below with your own.
