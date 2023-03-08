@@ -54,7 +54,9 @@
         "github": true,
         "changelog": true,
         "npm": true,
-        "tagFormat": "txs-tracer-core-v${VERSION}"
+        "tagFormat": "txs-tracer-core-v${VERSION}",
+        "outputPath": "dist/packages/txs-tracer-core",
+        "buildTarget": "${PROJECT_NAME}:build"
       }
     }
   },
