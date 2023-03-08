@@ -6,12 +6,16 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/packages/txs-tracer-core",
         "main": "packages/txs-tracer-core/src/index.ts",
         "tsConfig": "packages/txs-tracer-core/tsconfig.lib.json",
-        "assets": ["packages/txs-tracer-core/*.md"]
+        "assets": [
+          "packages/txs-tracer-core/*.md"
+        ]
       }
     },
     "publish": {
@@ -19,21 +23,38 @@
       "options": {
         "command": "node tools/scripts/publish.mjs txs-tracer-core {args.ver} {args.tag}"
       },
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["packages/txs-tracer-core/**/*.ts"]
+        "lintFilePatterns": [
+          "packages/txs-tracer-core/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/vite:test",
-      "outputs": ["coverage/packages/txs-tracer-core"],
+      "outputs": [
+        "coverage/packages/txs-tracer-core"
+      ],
       "options": {
         "passWithNoTests": true,
         "reportsDirectory": "../../coverage/packages/txs-tracer-core"
+      }
+    },
+    "semantic-release": {
+      "executor": "@theunderscorer/nx-semantic-release:semantic-release",
+      "options": {
+        "github": true,
+        "changelog": true,
+        "npm": true,
+        "tagFormat": "txs-tracer-core-v${VERSION}"
       }
     }
   },

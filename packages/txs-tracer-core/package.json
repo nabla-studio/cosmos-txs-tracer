@@ -1,5 +1,13 @@
 {
   "name": "@nabla-studio/txs-tracer-core",
-  "version": "0.0.1",
-  "type": "module"
+  "version": "0.0.0-semantic-release",
+  "type": "module",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/nabla-studio/cosmos-txs-tracer.git",
+		"directory": "packages/txs-tracer-core"
+	},
+	"bugs": {
+		"url": "https://github.com/nabla-studio/cosmos-txs-tracer/issues"
+	}
 }
