@@ -1,6 +1,7 @@
 {
   "name": "@nabla-studio/txs-tracer-core",
   "version": "0.0.0-semantic-release",
+	"description": "A series of state machines useful for tracking transactions for the Cosmos blockchain ecosystem",
   "type": "module",
 	"repository": {
 		"type": "git",
