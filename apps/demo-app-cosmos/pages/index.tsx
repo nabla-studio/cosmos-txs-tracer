@@ -102,7 +102,7 @@ export function Index() {
 
 		const gasEstimation = await stargateClient.simulate(address, [msg], '');
 
-		const fee: StdFee = {
+		/* const fee: StdFee = {
 			amount: [
 			{
 					denom: 'uosmo',
@@ -110,11 +110,11 @@ export function Index() {
 			}
 			],
 			gas: '86364'
-	};
+	}; */
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		/* const fee: StdFee = calculateFee(Math.round(gasEstimation * 1.3), stargateClient.gasPrice); */
+		const fee: StdFee = calculateFee(Math.round(gasEstimation * 1.3), stargateClient.gasPrice);
 
 		const responseSign = await stargateClient.sign(address, [msg], fee, '');
 
