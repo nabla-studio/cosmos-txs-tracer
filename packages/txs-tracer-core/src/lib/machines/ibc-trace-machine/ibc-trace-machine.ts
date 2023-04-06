@@ -11,6 +11,7 @@ import {
 	IBCTraceAckEventPayload,
 	IBCTraceContext,
 	IBCTraceEvents,
+	IBCTraceFinalState,
 	TxTraceDataResponse,
 	TxTraceFinalState,
 } from '../../types';
@@ -103,6 +104,11 @@ export const ibcTraceMachine = createMachine(
 				on: {
 					TRACE_ACK: {
 						target: 'acknowledge_packet',
+						actions: assign({
+							ackTx: (_, event) => {
+								return event.data.tx;
+							},
+						}),
 					},
 					ON_ERROR: {
 						target: 'error',
@@ -207,9 +213,17 @@ export const ibcTraceMachine = createMachine(
 			complete: {
 				entry: ['increaseStep'],
 				type: 'final',
+				data: ctx => ({
+					state: IBCTraceFinalState.Complete,
+					tx: ctx.ackTx,
+				}),
 			},
 			error: {
 				type: 'final',
+				data: ctx => ({
+					state: IBCTraceFinalState.Error,
+					errorCode: ctx.errorCode,
+				}),
 			},
 		},
 		schema: {
