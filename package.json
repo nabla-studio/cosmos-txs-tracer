@@ -32,7 +32,7 @@
 		"@nrwl/next": "^15.8.5",
 		"@xstate/react": "^3.2.1",
 		"buffer": "^6.0.3",
-		"chain-registry": "^1.9.0",
+		"chain-registry": "^1.10.0",
 		"framer-motion": "^10.0.1",
 		"long": "^5.2.1",
 		"next": "^13.2.3",
