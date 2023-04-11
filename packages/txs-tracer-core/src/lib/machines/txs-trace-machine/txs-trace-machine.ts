@@ -2,6 +2,7 @@ import { assign, createMachine, DoneInvokeEvent, raise } from 'xstate';
 import {
 	Tendermint34Client,
 	TxEvent,
+	TxResponse,
 	TxSearchResponse,
 } from '@cosmjs/tendermint-rpc';
 import { TxTraceContext, TxTraceEvents, TxTraceFinalState } from '../../types';
@@ -83,8 +84,8 @@ export const txTraceMachine = createMachine(
 						target: 'result',
 						actions: assign<
 							TxTraceContext,
-							DoneInvokeEvent<TxEvent>,
-							DoneInvokeEvent<TxEvent>
+							DoneInvokeEvent<TxResponse>,
+							DoneInvokeEvent<TxResponse>
 						>({
 							txs: (_, event) => [mapIndexedTx(event.data)],
 						}),

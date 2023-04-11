@@ -67,12 +67,14 @@ export const ibcTraceMachine = createMachine(
 									IBCTraceContext,
 									DoneInvokeEvent<TxTraceDataResponse>,
 									DoneInvokeEvent<IBCTraceAckEventPayload>
-								>((_, event) => ({
-									type: 'TRACE_ACK',
-									data: {
-										tx: event.data.txs ? event.data.txs[0] : undefined,
-									},
-								})),
+								>((_, event) => {
+									return {
+										type: 'TRACE_ACK',
+										data: {
+											tx: event.data.txs ? event.data.txs[0] : undefined,
+										},
+									};
+								}),
 							},
 							{
 								actions: raise((_, event) => ({
@@ -133,18 +135,22 @@ export const ibcTraceMachine = createMachine(
 						actions: choose<
 							IBCTraceContext,
 							DoneInvokeEvent<TxTraceDataResponse>,
-							DoneInvokeEvent<TxTraceDataResponse>
+							DoneInvokeEvent<IBCTraceAckEventPayload>
 						>([
 							{
 								cond: (_, event) => {
 									return (
 										event.data.state === TxTraceFinalState.Result &&
 										event.data.txs !== undefined &&
-										event.data.txs.length > 0
+										event.data.txs.length > 0 &&
+										event.data.txs[0].code === 0
 									);
 								},
-								actions: raise(() => ({
+								actions: raise((_, event) => ({
 									type: 'TRACE_COMPLETED',
+									data: {
+										tx: event.data.txs ? event.data.txs[0] : undefined,
+									},
 								})),
 							},
 							{
@@ -174,6 +180,8 @@ export const ibcTraceMachine = createMachine(
 								e => e.type === 'send_packet',
 							);
 
+							console.log(sendPacket);
+
 							if (sendPacket) {
 								const packetSequence: Attribute | undefined =
 									sendPacket.attributes.find(e => e.key === 'packet_sequence');
@@ -199,6 +207,11 @@ export const ibcTraceMachine = createMachine(
 				on: {
 					TRACE_COMPLETED: {
 						target: 'complete',
+						actions: assign({
+							ackTx: (_, event) => {
+								return event.data.tx;
+							},
+						}),
 					},
 					ON_ERROR: {
 						target: 'error',

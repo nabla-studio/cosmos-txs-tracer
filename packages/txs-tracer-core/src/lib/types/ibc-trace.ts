@@ -42,8 +42,14 @@ export const IBCTraceState = {
 export type IBCTraceFinalStates =
 	(typeof IBCTraceFinalState)[keyof typeof IBCTraceFinalState];
 
+export interface IBCTraceDataResponse {
+	state: IBCTraceFinalStates;
+	tx?: IndexedTx;
+	errorCode?: number;
+}
+
 export type IBCTraceEvents =
 	| { type: 'TRACE'; data: IBCTraceEventPayload }
 	| { type: 'TRACE_ACK'; data: IBCTraceAckEventPayload }
 	| { type: 'ON_ERROR'; data: IBCMachineResultErrorPayload }
-	| { type: 'TRACE_COMPLETED' };
+	| { type: 'TRACE_COMPLETED'; data: IBCTraceAckEventPayload };
