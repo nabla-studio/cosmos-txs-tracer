@@ -29,6 +29,12 @@ export const ibcTraceMachine = createMachine(
 					TRACE: {
 						target: 'send_packet',
 						actions: assign({
+							srcChannel: (_, event) => {
+								return event.data.srcChannel;
+							},
+							dstChannel: (_, event) => {
+								return event.data.dstChannel;
+							},
 							websocketUrl: (_, event) => {
 								return event.data.websocketUrl;
 							},
@@ -146,12 +152,14 @@ export const ibcTraceMachine = createMachine(
 										event.data.txs[0].code === 0
 									);
 								},
-								actions: raise((_, event) => ({
-									type: 'TRACE_COMPLETED',
-									data: {
-										tx: event.data.txs ? event.data.txs[0] : undefined,
-									},
-								})),
+								actions: raise((ctx, event) => {
+									return {
+										type: 'TRACE_COMPLETED',
+										data: {
+											tx: event.data.txs ? event.data.txs[0] : undefined,
+										},
+									};
+								}),
 							},
 							{
 								actions: raise((_, event) => ({
@@ -180,8 +188,6 @@ export const ibcTraceMachine = createMachine(
 								e => e.type === 'send_packet',
 							);
 
-							console.log(sendPacket);
-
 							if (sendPacket) {
 								const packetSequence: Attribute | undefined =
 									sendPacket.attributes.find(e => e.key === 'packet_sequence');
@@ -190,7 +196,7 @@ export const ibcTraceMachine = createMachine(
 									return {
 										type: 'TRACE',
 										data: {
-											query: `acknowledge_packet.packet_sequence=${packetSequence.value}`,
+											query: `acknowledge_packet.packet_src_channel='${ctx.srcChannel}' and acknowledge_packet.packet_dst_channel='${ctx.dstChannel}' and acknowledge_packet.packet_sequence=${packetSequence.value}`,
 											websocketUrl: ctx.websocketUrl,
 										},
 									};
@@ -251,6 +257,8 @@ export const ibcTraceMachine = createMachine(
 			currentStep: 0,
 			errorCode: 0,
 			query: '',
+			srcChannel: '', // ex: channel-140
+			dstChannel: '', // ex: channel-3316
 		},
 		predictableActionArguments: true,
 		preserveActionOrder: true,

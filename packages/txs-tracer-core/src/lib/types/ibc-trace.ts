@@ -11,12 +11,17 @@ export type IBCTraceContext = Omit<
 > & {
 	loading: boolean;
 	currentStep: number;
+	srcChannel: string;
+	dstChannel: string;
 	errorCode?: number;
 	txs?: IndexedTx;
 	ackTx?: IndexedTx;
 };
 
-export type IBCTraceEventPayload = TxTraceEventPayload;
+export type IBCTraceEventPayload = TxTraceEventPayload & {
+	srcChannel: string;
+	dstChannel: string;
+};
 
 export type IBCMachineResultErrorPayload = {
 	type: TxTraceFinalStates;
