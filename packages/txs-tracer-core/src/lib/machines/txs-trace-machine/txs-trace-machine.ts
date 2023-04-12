@@ -23,7 +23,6 @@ export const txTraceMachine = createMachine(
 
 							callback('CONNECTION_SUCCESS');
 						} catch (err) {
-							console.log(err);
 							callback('CONNECTION_ERROR');
 						}
 					},
