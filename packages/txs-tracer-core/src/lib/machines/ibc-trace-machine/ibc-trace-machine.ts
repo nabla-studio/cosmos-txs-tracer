@@ -135,7 +135,7 @@ export const ibcTraceMachine = createMachine(
 						actions: choose<
 							IBCTraceContext,
 							DoneInvokeEvent<TxTraceDataResponse>,
-							DoneInvokeEvent<IBCTraceAckEventPayload>
+							DoneInvokeEvent<IBCTraceAckEventPayload | TxTraceDataResponse>
 						>([
 							{
 								cond: (_, event) => {
