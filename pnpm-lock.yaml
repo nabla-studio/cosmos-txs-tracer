@@ -169,8 +169,8 @@ devDependencies:
     specifier: 14.0.0
     version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
   '@theunderscorer/nx-semantic-release':
-    specifier: ^2.0.1
-    version: 2.0.1(nx@15.9.2)(typescript@4.9.5)
+    specifier: ^2.3.0
+    version: 2.3.0(nx@15.9.2)
   '@types/jest':
     specifier: ^29.4.0
     version: 29.4.0
@@ -4807,21 +4807,6 @@ packages:
       - typescript
     dev: true
 
-  /@nrwl/devkit@15.7.2(nx@15.9.2)(typescript@4.9.5):
-    resolution: {integrity: sha512-HMGi7L6w2g4IrYwhb04snD8Zr24Z/gzau5i9WUNkwzrjeR1xAm0Cc9WRre221zaeohtK11gyBt7BerT1tgkNwA==}
-    peerDependencies:
-      nx: '>= 14.1 <= 16'
-    dependencies:
-      '@phenomnomnominal/tsquery': 4.1.1(typescript@4.9.5)
-      ejs: 3.1.8
-      ignore: 5.2.4
-      nx: 15.9.2
-      semver: 7.3.4
-      tslib: 2.5.0
-    transitivePeerDependencies:
-      - typescript
-    dev: true
-
   /@nrwl/devkit@15.9.2(nx@15.9.2):
     resolution: {integrity: sha512-2DvTstVZb91m+d4wqUJMBHQ3elxyabdmFE6/3aXmtOGeDxTyXyDzf/1O6JvBBiL8K6XC3ZYchjtxUHgxl/NJ5A==}
     peerDependencies:
@@ -5370,8 +5355,8 @@ packages:
       tslib: 2.5.0
     dev: true
 
-  /@pnpm/config.env-replace@1.0.0:
-    resolution: {integrity: sha512-ZVPVDi1E8oeXlYqkGRtX0CkzLTwE2zt62bjWaWKaAvI8NZqHzlMvGeSNDpW+JB3+aKanYb4UETJOF1/CxGPemA==}
+  /@pnpm/config.env-replace@1.1.0:
+    resolution: {integrity: sha512-htyl8TWnKL7K/ESFa1oW2UB5lVDxuF5DpM7tBi6Hu2LNL3mWkIzNLG6N4zoCUP1lCKNxWy/3iu8mS8MvToGd6w==}
     engines: {node: '>=12.22.0'}
     dev: true
 
@@ -5382,11 +5367,11 @@ packages:
       graceful-fs: 4.2.10
     dev: true
 
-  /@pnpm/npm-conf@2.1.0:
-    resolution: {integrity: sha512-Oe6ntvgsMTE3hDIqy6sajqHF+MnzJrOF06qC2QSiUEybLL7cp6tjoKUa32gpd9+KPVl4QyMs3E3nsXrx/Vdnlw==}
+  /@pnpm/npm-conf@2.1.1:
+    resolution: {integrity: sha512-yfRcuupmxxeDOSxvw4g+wFCrGiPD0L32f5WMzqMXp7Rl93EOCdFiDcaSNnZ10Up9GdNqkj70UTa8hfhPFphaZA==}
     engines: {node: '>=12'}
     dependencies:
-      '@pnpm/config.env-replace': 1.0.0
+      '@pnpm/config.env-replace': 1.1.0
       '@pnpm/network.ca-file': 1.0.2
       config-chain: 1.1.13
     dev: true
@@ -6001,18 +5986,17 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: true
 
-  /@theunderscorer/nx-semantic-release@2.0.1(nx@15.9.2)(typescript@4.9.5):
-    resolution: {integrity: sha512-zvy9ISClJ02W+bwQFCh8jOykPFN325Jf4kUpPJpbbLL0m6ns1urdPmA/wsL/etlJh5JeEl0UXcJf2fTvOOsCxw==}
+  /@theunderscorer/nx-semantic-release@2.3.0(nx@15.9.2):
+    resolution: {integrity: sha512-W+GMR56EMTi1Qqn6Rgfn8wg3Gm4jEJ5iO4/gpz0e49RLuOjtOmw+VuPS4Ir9Z3ozshROSs58wFuCGqfQGeyKRQ==}
     engines: {node: '>=16.0.0'}
     dependencies:
-      '@nrwl/devkit': 15.7.2(nx@15.9.2)(typescript@4.9.5)
+      '@nrwl/devkit': 15.9.2(nx@15.9.2)
       '@semantic-release/changelog': 6.0.2(semantic-release@20.1.0)
       '@semantic-release/exec': 6.0.3(semantic-release@20.1.0)
       '@semantic-release/git': 10.0.1(semantic-release@20.1.0)
       '@semantic-release/github': 8.0.7(semantic-release@20.1.0)
       '@semantic-release/npm': 9.0.2(semantic-release@20.1.0)
-      cosmiconfig: 7.1.0
-      fs-extra: 10.1.0
+      cosmiconfig: 7.0.1
       remeda: 0.0.32
       semantic-release: 20.1.0
       semantic-release-plugin-decorators: 3.0.1(semantic-release@20.1.0)
@@ -6020,7 +6004,6 @@ packages:
       - encoding
       - nx
       - supports-color
-      - typescript
     dev: true
 
   /@tootallnate/once@2.0.0:
@@ -8357,6 +8340,17 @@ packages:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
+
+  /cosmiconfig@7.0.1:
+    resolution: {integrity: sha512-a1YWNUV2HwGimB7dU2s1wUMurNKjpx60HxBB6xUM8Re+2s1g1IIfJvFR0/iCF+XHdE0GMTKTuLR32UQff4TEyQ==}
+    engines: {node: '>=10'}
+    dependencies:
+      '@types/parse-json': 4.0.0
+      import-fresh: 3.3.0
+      parse-json: 5.2.0
+      path-type: 4.0.0
+      yaml: 1.10.2
+    dev: true
 
   /cosmiconfig@7.1.0:
     resolution: {integrity: sha512-AdmX6xUzdNASswsFtmwSt7Vj8po9IuqXm0UXz7QKPuEUmPB4XyjGfaAr2PSuELMwkRMVH1EpIkX5bTZGRB3eCA==}
@@ -12392,7 +12386,7 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /marked-terminal@5.1.1(marked@4.2.12):
+  /marked-terminal@5.1.1(marked@4.3.0):
     resolution: {integrity: sha512-+cKTOx9P4l7HwINYhzbrBSyzgxO2HaHKGZGuB1orZsMIgXYaJyfidT81VXRdpelW/PcHEWxywscePVgI/oUF6g==}
     engines: {node: '>=14.13.1 || >=16.0.0'}
     peerDependencies:
@@ -12402,13 +12396,13 @@ packages:
       cardinal: 2.1.1
       chalk: 5.2.0
       cli-table3: 0.6.3
-      marked: 4.2.12
+      marked: 4.3.0
       node-emoji: 1.11.0
       supports-hyperlinks: 2.3.0
     dev: true
 
-  /marked@4.2.12:
-    resolution: {integrity: sha512-yr8hSKa3Fv4D3jdZmtMMPghgVt6TWbk86WQaWhDloQjRSQhMMYCAro7jP7VDJrjjdV8pxVxMssXS8B8Y5DZ5aw==}
+  /marked@4.3.0:
+    resolution: {integrity: sha512-PRsaiG84bK+AMvxziE/lCFss8juXjNaWzVbN5tXAm4XjeaS9NAHhop+PjQxz2A9h8Q4M/xGmzP8vqNwy6JeK0A==}
     engines: {node: '>= 12'}
     hasBin: true
     dev: true
@@ -14385,7 +14379,7 @@ packages:
     resolution: {integrity: sha512-o/3ikDxtXaA59BmZuZrJZDJv8NMDGSj+6j6XaeBmHw8eY1i1qd9+6H+LjVvQXx3HN6aRCGa1cUdJ9RaJZUugnQ==}
     engines: {node: '>=14'}
     dependencies:
-      '@pnpm/npm-conf': 2.1.0
+      '@pnpm/npm-conf': 2.1.1
     dev: true
 
   /regjsparser@0.9.1:
@@ -14710,8 +14704,8 @@ packages:
       hook-std: 3.0.0
       hosted-git-info: 6.1.1
       lodash-es: 4.17.21
-      marked: 4.2.12
-      marked-terminal: 5.1.1(marked@4.2.12)
+      marked: 4.3.0
+      marked-terminal: 5.1.1(marked@4.3.0)
       micromatch: 4.0.5
       p-each-series: 3.0.0
       p-reduce: 3.0.0
