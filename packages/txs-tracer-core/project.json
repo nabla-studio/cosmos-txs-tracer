@@ -1,7 +1,7 @@
 {
   "name": "txs-tracer-core",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/txs-tracer-core",
+  "sourceRoot": "packages/txs-tracer-core/src",
   "projectType": "library",
   "targets": {
     "build": {
@@ -14,8 +14,7 @@
         "tsConfig": "packages/txs-tracer-core/tsconfig.lib.json",
         "compiler": "babel",
         "external": ["typescript"],
-        "format": ["cjs", "esm"],
-        "assets": ["packages/txs-tracer-core/CHANGELOG.md", "packages/txs-tracer-core/README.md"]
+        "format": ["cjs", "esm"]
       }
     },
     "publish": {
