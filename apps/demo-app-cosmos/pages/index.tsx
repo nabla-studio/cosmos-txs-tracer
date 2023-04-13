@@ -164,6 +164,18 @@ export function Index() {
 		const { transfer } = ibc.applications.transfer.v1.MessageComposer.withTypeUrl;
 		const stargateClient = await getJunoSigningStargateClient();
 
+		const isMatch = ['complete', 'error'].some(
+			crossSwapState.matches
+		)
+
+		console.log(isMatch);
+
+		if (isMatch) {
+			sendCrossSwapMachine({
+				type: 'RESET'
+			})
+		}
+
 		const memo = {
 			wasm: {
 				contract: 'osmo1efakw4was99usxve258p58a5a26f0yt072gvyej5zr4lv5r0hxqqsddqgg',
