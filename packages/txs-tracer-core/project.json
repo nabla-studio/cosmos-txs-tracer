@@ -1,21 +1,21 @@
 {
   "name": "txs-tracer-core",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/txs-tracer-core/src",
+  "sourceRoot": "packages/txs-tracer-core",
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nrwl/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
       "options": {
+        "project": "packages/txs-tracer-core/package.json",
         "outputPath": "dist/packages/txs-tracer-core",
         "main": "packages/txs-tracer-core/src/index.ts",
         "tsConfig": "packages/txs-tracer-core/tsconfig.lib.json",
-        "assets": [
-          "packages/txs-tracer-core/*.md"
-        ]
+        "compiler": "babel",
+        "external": ["typescript"],
+        "format": ["cjs", "esm"],
+        "assets": ["packages/txs-tracer-core/CHANGELOG.md", "packages/txs-tracer-core/README.md"]
       }
     },
     "publish": {
