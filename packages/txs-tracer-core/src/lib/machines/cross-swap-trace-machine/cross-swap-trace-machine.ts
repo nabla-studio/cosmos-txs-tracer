@@ -260,6 +260,8 @@ export const crossSwapTraceMachine = createMachine(
 			loading: false,
 			currentStep: 0,
 			errorCode: 0,
+			srcChannel: '',
+			dstChannel: '',
 			query: '',
 		},
 		predictableActionArguments: true,
