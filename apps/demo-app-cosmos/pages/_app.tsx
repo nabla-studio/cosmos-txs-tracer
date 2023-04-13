@@ -25,9 +25,13 @@ function MyApp({ Component, pageProps }: AppProps) {
         signerOptions={{
           signingStargate: (chain: Chain) => {
             switch (chain.chain_name) {
-              case "osmosis":
+              case "osmosistestnet":
                 return {
-                  gasPrice: new GasPrice(Decimal.zero(1), "uosmo"),
+                  gasPrice: new GasPrice(Decimal.zero(1), "uosmo")
+                };
+              case "junotestnet":
+                return {
+                  gasPrice: new GasPrice(Decimal.zero(1), "ujunox")
                 };
               default:
                 return void 0;

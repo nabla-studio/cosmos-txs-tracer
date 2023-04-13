@@ -11,6 +11,7 @@ import {
 	IBCTraceAckEventPayload,
 	IBCTraceContext,
 	IBCTraceEvents,
+	IBCTraceFinalState,
 	TxTraceDataResponse,
 	TxTraceFinalState,
 } from '../../types';
@@ -28,6 +29,12 @@ export const ibcTraceMachine = createMachine(
 					TRACE: {
 						target: 'send_packet',
 						actions: assign({
+							srcChannel: (_, event) => {
+								return event.data.srcChannel;
+							},
+							dstChannel: (_, event) => {
+								return event.data.dstChannel;
+							},
 							websocketUrl: (_, event) => {
 								return event.data.websocketUrl;
 							},
@@ -66,12 +73,14 @@ export const ibcTraceMachine = createMachine(
 									IBCTraceContext,
 									DoneInvokeEvent<TxTraceDataResponse>,
 									DoneInvokeEvent<IBCTraceAckEventPayload>
-								>((_, event) => ({
-									type: 'TRACE_ACK',
-									data: {
-										tx: event.data.txs ? event.data.txs[0] : undefined,
-									},
-								})),
+								>((_, event) => {
+									return {
+										type: 'TRACE_ACK',
+										data: {
+											tx: event.data.txs ? event.data.txs[0] : undefined,
+										},
+									};
+								}),
 							},
 							{
 								actions: raise((_, event) => ({
@@ -103,6 +112,11 @@ export const ibcTraceMachine = createMachine(
 				on: {
 					TRACE_ACK: {
 						target: 'acknowledge_packet',
+						actions: assign({
+							ackTx: (_, event) => {
+								return event.data.tx;
+							},
+						}),
 					},
 					ON_ERROR: {
 						target: 'error',
@@ -127,19 +141,25 @@ export const ibcTraceMachine = createMachine(
 						actions: choose<
 							IBCTraceContext,
 							DoneInvokeEvent<TxTraceDataResponse>,
-							DoneInvokeEvent<TxTraceDataResponse>
+							DoneInvokeEvent<IBCTraceAckEventPayload | TxTraceDataResponse>
 						>([
 							{
 								cond: (_, event) => {
 									return (
 										event.data.state === TxTraceFinalState.Result &&
 										event.data.txs !== undefined &&
-										event.data.txs.length > 0
+										event.data.txs.length > 0 &&
+										event.data.txs[0].code === 0
 									);
 								},
-								actions: raise(() => ({
-									type: 'TRACE_COMPLETED',
-								})),
+								actions: raise((ctx, event) => {
+									return {
+										type: 'TRACE_COMPLETED',
+										data: {
+											tx: event.data.txs ? event.data.txs[0] : undefined,
+										},
+									};
+								}),
 							},
 							{
 								actions: raise((_, event) => ({
@@ -176,7 +196,7 @@ export const ibcTraceMachine = createMachine(
 									return {
 										type: 'TRACE',
 										data: {
-											query: `acknowledge_packet.packet_sequence=${packetSequence.value}`,
+											query: `acknowledge_packet.packet_src_channel='${ctx.srcChannel}' and acknowledge_packet.packet_dst_channel='${ctx.dstChannel}' and acknowledge_packet.packet_sequence=${packetSequence.value}`,
 											websocketUrl: ctx.websocketUrl,
 										},
 									};
@@ -193,6 +213,11 @@ export const ibcTraceMachine = createMachine(
 				on: {
 					TRACE_COMPLETED: {
 						target: 'complete',
+						actions: assign({
+							ackTx: (_, event) => {
+								return event.data.tx;
+							},
+						}),
 					},
 					ON_ERROR: {
 						target: 'error',
@@ -207,9 +232,17 @@ export const ibcTraceMachine = createMachine(
 			complete: {
 				entry: ['increaseStep'],
 				type: 'final',
+				data: ctx => ({
+					state: IBCTraceFinalState.Complete,
+					tx: ctx.ackTx,
+				}),
 			},
 			error: {
 				type: 'final',
+				data: ctx => ({
+					state: IBCTraceFinalState.Error,
+					errorCode: ctx.errorCode,
+				}),
 			},
 		},
 		schema: {
@@ -224,6 +257,8 @@ export const ibcTraceMachine = createMachine(
 			currentStep: 0,
 			errorCode: 0,
 			query: '',
+			srcChannel: '', // ex: channel-140
+			dstChannel: '', // ex: channel-3316
 		},
 		predictableActionArguments: true,
 		preserveActionOrder: true,
