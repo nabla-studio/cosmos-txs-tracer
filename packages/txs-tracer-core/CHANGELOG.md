@@ -1,3 +1,17 @@
+# [1.0.0-next.3](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.2...txs-tracer-core-v1.0.0-next.3) (2023-04-13)
+
+
+### Bug Fixes
+
+* **txs-tracer-core:** :wrench: fix project config ([e9a1079](https://github.com/nabla-studio/cosmos-txs-tracer/commit/e9a1079ffd3d20c9d261a04fcb9d2208516f0a51))
+
+
+### Features
+
+* :arrow_up: upgrade nx js deps ([567131a](https://github.com/nabla-studio/cosmos-txs-tracer/commit/567131a6f63a995a818361cf35733e7ba77322e9))
+* :arrow_up: upgrade semantic release dep ([26aa66e](https://github.com/nabla-studio/cosmos-txs-tracer/commit/26aa66ebdd964dc6fff5aa85ad9722954c42de6d))
+* **txs-tracer-core:** :sparkles: add esm support ([8ba73c0](https://github.com/nabla-studio/cosmos-txs-tracer/commit/8ba73c0ccbe89957151ff567d3cb64aa8df49ab1))
+
 # [1.0.0-next.2](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.1...txs-tracer-core-v1.0.0-next.2) (2023-04-13)
 
 
