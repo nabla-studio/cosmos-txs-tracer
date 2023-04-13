@@ -17,6 +17,18 @@ import { IndexedTx } from '@cosmjs/stargate';
 import { fromAscii, fromBase64, toAscii } from '@cosmjs/encoding';
 import { txTraceMachine } from '../txs-trace-machine';
 
+const initialContext: CrossSwapTraceContext = {
+	subscribeTimeout: 60_000,
+	connectionTimeout: 10_000,
+	websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
+	loading: false,
+	currentStep: 0,
+	errorCode: 0,
+	srcChannel: '',
+	dstChannel: '',
+	query: '',
+};
+
 export const crossSwapTraceMachine = createMachine(
 	{
 		id: 'crossSwapTraceMachine',
@@ -238,31 +250,37 @@ export const crossSwapTraceMachine = createMachine(
 			},
 			complete: {
 				entry: ['increaseStep'],
-				type: 'final',
 				data: ctx => ({
 					state: CrossSwapTraceFinalState.Complete,
 					M1Tx: ctx.M1Tx,
 					M2Tx: ctx.M2Tx,
 				}),
+				on: {
+					RESET: {
+						target: 'idle',
+						actions: assign({
+							...initialContext,
+						}),
+					},
+				},
 			},
 			error: {
-				type: 'final',
 				data: ctx => ({
 					state: CrossSwapTraceFinalState.Error,
 					errorCode: ctx.errorCode,
 				}),
+				on: {
+					RESET: {
+						target: 'idle',
+						actions: assign({
+							...initialContext,
+						}),
+					},
+				},
 			},
 		},
 		context: {
-			subscribeTimeout: 60_000,
-			connectionTimeout: 10_000,
-			websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
-			loading: false,
-			currentStep: 0,
-			errorCode: 0,
-			srcChannel: '',
-			dstChannel: '',
-			query: '',
+			...initialContext,
 		},
 		predictableActionArguments: true,
 		preserveActionOrder: true,

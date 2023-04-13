@@ -31,4 +31,5 @@ export type CrossSwapTraceEvents =
 	| { type: 'TRACE_M2'; data: IBCTraceAckEventPayload }
 	| { type: 'ON_COMPLETE'; data: IBCTraceAckEventPayload }
 	| { type: 'ON_ERROR'; data: IBCMachineResultErrorPayload }
+	| { type: 'RESET' }
 	| { type: 'TRACE_COMPLETED' };
