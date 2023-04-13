@@ -1,3 +1,22 @@
+# [1.0.0-next.2](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.1...txs-tracer-core-v1.0.0-next.2) (2023-04-13)
+
+
+### Bug Fixes
+
+* **txs-tracer-core:** :bug: fix cross machine build ([a46a94b](https://github.com/nabla-studio/cosmos-txs-tracer/commit/a46a94b2d67d9ef67d51e64c5f2f6148273550ad))
+* **txs-tracer-core:** :bug: fix data state ([239a511](https://github.com/nabla-studio/cosmos-txs-tracer/commit/239a5115c5fa643d38f9f6c4551c02d99200834b))
+* **txs-tracer-core:** :bug: fix ibc trace machine types ([a0f7995](https://github.com/nabla-studio/cosmos-txs-tracer/commit/a0f7995ef505ad2283d28167d18b7b5f58e9e251))
+
+
+### Features
+
+* **demo-app-cosmos:** :arrow_up: upgrade chain-registry deps ([6a7d98f](https://github.com/nabla-studio/cosmos-txs-tracer/commit/6a7d98f7f094c78dd7ec4f7b41703ae8fcef7b31))
+* **txs-tracer-core:** :arrow_up: upgrade cosmjs and osmojs deps ([528642d](https://github.com/nabla-studio/cosmos-txs-tracer/commit/528642d5d57d2c9366a00c2a6f3f276c4ec36e46))
+* **txs-tracer-core:** :sparkles: add cross swap trace machine ([dc31bb3](https://github.com/nabla-studio/cosmos-txs-tracer/commit/dc31bb3e1f11027e728fb6d620ae47c820ec67ef))
+* **txs-tracer-core:** :sparkles: add ibc trace data result ([94e326f](https://github.com/nabla-studio/cosmos-txs-tracer/commit/94e326f1028f7b03fed7232405e1eeb30ac12018))
+* **txs-tracer-core:** :sparkles: add reset event ([908def0](https://github.com/nabla-studio/cosmos-txs-tracer/commit/908def0d40b541e13e94a93aab7cae8977d15ef5))
+* **txs-tracer-core:** :sparkles: improve ibc trace using channels ([f4b8acc](https://github.com/nabla-studio/cosmos-txs-tracer/commit/f4b8acc23e13e3b7ec93c046d900a1e8bd1e8ae8))
+
 # 1.0.0-next.1 (2023-03-08)
 
 
