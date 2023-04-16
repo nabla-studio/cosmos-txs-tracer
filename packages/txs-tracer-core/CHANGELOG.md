@@ -1,3 +1,10 @@
+# [1.0.0-next.4](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.3...txs-tracer-core-v1.0.0-next.4) (2023-04-16)
+
+
+### Features
+
+* **txs-tracer-core:** :sparkles: improve error handling ([1e91281](https://github.com/nabla-studio/cosmos-txs-tracer/commit/1e9128175a272b7d83202dbc4513f6add1d30650))
+
 # [1.0.0-next.3](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.2...txs-tracer-core-v1.0.0-next.3) (2023-04-13)
 
 
