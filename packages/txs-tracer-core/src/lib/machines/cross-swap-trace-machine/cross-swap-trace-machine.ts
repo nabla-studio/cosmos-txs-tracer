@@ -6,16 +6,13 @@ import {
 	IBCTraceDataResponse,
 	IBCTraceFinalState,
 	CrossSwapTraceFinalState,
-	SwapContractResponseRaw,
-	SwapContractResponse,
 	TxTraceFinalState,
 	TxTraceDataResponse,
 } from '../../types';
 import { ibcTraceMachine } from '../ibc-trace-machine';
 import { choose } from 'xstate/lib/actions';
-import { IndexedTx } from '@cosmjs/stargate';
-import { fromAscii, fromBase64, toAscii } from '@cosmjs/encoding';
 import { txTraceMachine } from '../txs-trace-machine';
+import { getCrossSwapPacketSequence } from '../../utils';
 
 const initialContext: CrossSwapTraceContext = {
 	subscribeTimeout: 60_000,
@@ -24,6 +21,7 @@ const initialContext: CrossSwapTraceContext = {
 	loading: false,
 	currentStep: 0,
 	errorCode: 0,
+	errorMessage: '',
 	srcChannel: '',
 	dstChannel: '',
 	query: '',
@@ -79,7 +77,8 @@ export const crossSwapTraceMachine = createMachine(
 								cond: (_, event) => {
 									return (
 										event.data.state === IBCTraceFinalState.Complete &&
-										event.data.tx !== undefined
+										event.data.tx !== undefined &&
+										getCrossSwapPacketSequence(event.data.tx).packetSequence !== undefined
 									);
 								},
 								actions: raise<
@@ -94,6 +93,33 @@ export const crossSwapTraceMachine = createMachine(
 								})),
 							},
 							{
+								cond: (_, event) => {
+									return (
+										event.data.state === IBCTraceFinalState.Complete &&
+										event.data.tx !== undefined &&
+										getCrossSwapPacketSequence(event.data.tx).error !== undefined
+									);
+								},
+								actions: raise((_, event) => {
+									let errorMessage: string | undefined = '';
+
+									if (event.data.tx) {
+										const data = getCrossSwapPacketSequence(event.data.tx);
+
+										errorMessage = data.error;
+									}
+
+									return {
+										type: 'ON_ERROR',
+										data: {
+											state: event.data.state,
+											code: event.data.errorCode,
+											errorMessage,
+										},
+									};
+								}),
+							},
+							{
 								actions: raise((_, event) => ({
 									type: 'ON_ERROR',
 									data: {
@@ -106,7 +132,7 @@ export const crossSwapTraceMachine = createMachine(
 					},
 				},
 				entry: [
-					'toggleLoading',
+					'startLoading',
 					'increaseStep',
 					sendTo('traceIBCM1', (ctx, event) => ({
 						type: 'TRACE',
@@ -118,7 +144,6 @@ export const crossSwapTraceMachine = createMachine(
 						},
 					})),
 				],
-				exit: ['toggleLoading'],
 				on: {
 					TRACE_M2: {
 						target: 'trace_ibc_m2',
@@ -186,40 +211,21 @@ export const crossSwapTraceMachine = createMachine(
 					},
 				},
 				entry: [
-					'toggleLoading',
 					'increaseStep',
 					sendTo('traceIBCM2', (ctx: CrossSwapTraceContext) => {
 						const tx = ctx.M1Tx;
 
 						if (tx) {
-							const events = [...tx.events].reverse();
-							const fungibleTokenPacket = events.find(
-								e => e.type === 'fungible_token_packet',
-							);
+							const data = getCrossSwapPacketSequence(tx);
 
-							if (fungibleTokenPacket) {
-								const success = fungibleTokenPacket.attributes.find(
-									e => e.key === 'success',
-								);
-
-								if (success) {
-									const responseRaw: SwapContractResponseRaw = JSON.parse(success.value);
-
-									const response: SwapContractResponse = {
-										contract_result: JSON.parse(
-											fromAscii(fromBase64(responseRaw.contract_result)),
-										),
-										ibc_ack: JSON.parse(fromAscii(fromBase64(responseRaw.ibc_ack))),
-									};
-
-									return {
-										type: 'TRACE',
-										data: {
-											query: `write_acknowledgement.packet_src_channel='${ctx.dstChannel}' and write_acknowledgement.packet_dst_channel='${ctx.srcChannel}' and write_acknowledgement.packet_sequence=${response.contract_result.packet_sequence}`,
-											websocketUrl: ctx.websocketUrl,
-										},
-									};
-								}
+							if (data.packetSequence) {
+								return {
+									type: 'TRACE',
+									data: {
+										query: `write_acknowledgement.packet_src_channel='${ctx.dstChannel}' and write_acknowledgement.packet_dst_channel='${ctx.srcChannel}' and write_acknowledgement.packet_sequence=${data.packetSequence}`,
+										websocketUrl: ctx.websocketUrl,
+									},
+								};
 							}
 						}
 
@@ -228,7 +234,6 @@ export const crossSwapTraceMachine = createMachine(
 						};
 					}),
 				],
-				exit: ['toggleLoading'],
 				on: {
 					ON_COMPLETE: {
 						target: 'complete',
@@ -249,7 +254,7 @@ export const crossSwapTraceMachine = createMachine(
 				},
 			},
 			complete: {
-				entry: ['increaseStep'],
+				entry: ['stopLoading', 'increaseStep'],
 				data: ctx => ({
 					state: CrossSwapTraceFinalState.Complete,
 					M1Tx: ctx.M1Tx,
@@ -265,6 +270,7 @@ export const crossSwapTraceMachine = createMachine(
 				},
 			},
 			error: {
+				entry: ['stopLoading'],
 				data: ctx => ({
 					state: CrossSwapTraceFinalState.Error,
 					errorCode: ctx.errorCode,
@@ -287,8 +293,11 @@ export const crossSwapTraceMachine = createMachine(
 	},
 	{
 		actions: {
-			toggleLoading: context => {
-				context.loading = !context.loading;
+			startLoading: context => {
+				context.loading = true;
+			},
+			stopLoading: context => {
+				context.loading = false;
 			},
 			increaseStep: context => {
 				context.currentStep = context.currentStep + 1;
