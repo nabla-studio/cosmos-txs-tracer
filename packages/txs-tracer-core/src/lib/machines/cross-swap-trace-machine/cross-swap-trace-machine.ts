@@ -24,6 +24,7 @@ const initialContext: CrossSwapTraceContext = {
 	dstWebsocketUrl: '',
 	loading: false,
 	currentStep: 0,
+	totalSteps: 4,
 	errorCode: 0,
 	errorMessage: '',
 	srcChannel: '',

@@ -11,6 +11,7 @@ export type CrossSwapTraceContext = Omit<IBCTraceContext, 'ackTx' | 'txs'> & {
 	M1Tx?: IndexedTx;
 	M2Tx?: IndexedTx;
 	errorMessage?: string;
+	totalSteps: number;
 };
 
 export type CrossSwapMachineResultErrorPayload =
