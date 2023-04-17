@@ -12,12 +12,16 @@ import {
 import { ibcTraceMachine } from '../ibc-trace-machine';
 import { choose } from 'xstate/lib/actions';
 import { txTraceMachine } from '../txs-trace-machine';
-import { getCrossSwapPacketSequence } from '../../utils';
+import {
+	getCrossSwapPacketSequence,
+	getFungibleTokenPacketResponses,
+} from '../../utils';
 
 const initialContext: CrossSwapTraceContext = {
 	subscribeTimeout: 60_000,
 	connectionTimeout: 10_000,
-	websocketUrl: 'wss://rpc-osmosis.blockapsis.com',
+	websocketUrl: '',
+	dstWebsocketUrl: '',
 	loading: false,
 	currentStep: 0,
 	errorCode: 0,
@@ -50,6 +54,9 @@ export const crossSwapTraceMachine = createMachine(
 							websocketUrl: (_, event) => {
 								return event.data.websocketUrl;
 							},
+							dstWebsocketUrl: (_, event) => {
+								return event.data.dstWebsocketUrl;
+							},
 							query: (_, event) => {
 								return event.data.query;
 							},
@@ -77,8 +84,9 @@ export const crossSwapTraceMachine = createMachine(
 								cond: (_, event) => {
 									return (
 										event.data.state === IBCTraceFinalState.Complete &&
-										event.data.tx !== undefined &&
-										getCrossSwapPacketSequence(event.data.tx).packetSequence !== undefined
+										event.data.ackTx !== undefined &&
+										getCrossSwapPacketSequence(event.data.ackTx).packetSequence !==
+											undefined
 									);
 								},
 								actions: raise<
@@ -88,7 +96,7 @@ export const crossSwapTraceMachine = createMachine(
 								>((_, event) => ({
 									type: 'TRACE_M2',
 									data: {
-										tx: event.data.tx,
+										tx: event.data.ackTx,
 									},
 								})),
 							},
@@ -96,15 +104,15 @@ export const crossSwapTraceMachine = createMachine(
 								cond: (_, event) => {
 									return (
 										event.data.state === IBCTraceFinalState.Complete &&
-										event.data.tx !== undefined &&
-										getCrossSwapPacketSequence(event.data.tx).error !== undefined
+										event.data.ackTx !== undefined &&
+										getCrossSwapPacketSequence(event.data.ackTx).error !== undefined
 									);
 								},
 								actions: raise((_, event) => {
 									let errorMessage: string | undefined = '';
 
-									if (event.data.tx) {
-										const data = getCrossSwapPacketSequence(event.data.tx);
+									if (event.data.ackTx) {
+										const data = getCrossSwapPacketSequence(event.data.ackTx);
 
 										errorMessage = data.error;
 									}
@@ -133,18 +141,25 @@ export const crossSwapTraceMachine = createMachine(
 				},
 				entry: [
 					'startLoading',
-					'increaseStep',
 					sendTo('traceIBCM1', (ctx, event) => ({
 						type: 'TRACE',
 						data: {
 							query: event.type === 'TRACE' ? event.data.query : '',
 							websocketUrl: ctx.websocketUrl,
+							dstWebsocketUrl: ctx.dstWebsocketUrl,
 							srcChannel: ctx.srcChannel,
 							dstChannel: ctx.dstChannel,
 						},
 					})),
 				],
 				on: {
+					INCREASE_STEP: {
+						actions: assign({
+							currentStep: ctx => {
+								return ctx.currentStep + 1;
+							},
+						}),
+					},
 					TRACE_M2: {
 						target: 'trace_ibc_m2',
 						actions: assign({
@@ -181,12 +196,18 @@ export const crossSwapTraceMachine = createMachine(
 						>([
 							{
 								cond: (_, event) => {
-									return (
+									if (
 										event.data.state === TxTraceFinalState.Result &&
 										event.data.txs !== undefined &&
 										event.data.txs.length > 0 &&
 										event.data.txs[0].code === 0
-									);
+									) {
+										const { error } = getFungibleTokenPacketResponses(event.data.txs[0]);
+
+										return !error;
+									}
+
+									return false;
 								},
 								actions: raise((_, event) => ({
 									type: 'ON_COMPLETE',
@@ -196,22 +217,31 @@ export const crossSwapTraceMachine = createMachine(
 								})),
 							},
 							{
-								actions: raise((_, event) => ({
-									type: 'ON_ERROR',
-									data: {
-										state: event.data.state,
-										code:
-											event.data.txs && event.data.txs.length > 0
-												? event.data.txs[0].code
-												: -1,
-									},
-								})),
+								actions: raise((_, event) => {
+									let errorMessage: string | undefined = undefined;
+									let code = -1;
+
+									if (event.data.txs && event.data.txs.length > 0) {
+										const tx = event.data.txs[0];
+
+										errorMessage = getFungibleTokenPacketResponses(tx).error?.value;
+										code = tx.code;
+									}
+
+									return {
+										type: 'ON_ERROR',
+										data: {
+											state: event.data.state,
+											errorMessage,
+											code,
+										},
+									};
+								}),
 							},
 						]),
 					},
 				},
 				entry: [
-					'increaseStep',
 					sendTo('traceIBCM2', (ctx: CrossSwapTraceContext) => {
 						const tx = ctx.M1Tx;
 
@@ -246,6 +276,9 @@ export const crossSwapTraceMachine = createMachine(
 					ON_ERROR: {
 						target: 'error',
 						actions: assign({
+							errorMessage: (_, event) => {
+								return event.data.errorMessage;
+							},
 							errorCode: (_, event) => {
 								return event.data.code;
 							},

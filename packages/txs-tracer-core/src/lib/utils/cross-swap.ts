@@ -1,40 +1,58 @@
 import { IndexedTx } from '@cosmjs/stargate';
 import { SwapContractResponseRaw, SwapContractResponse } from '../types';
 import { fromAscii, fromBase64 } from '@cosmjs/encoding';
+import { Attribute } from '@cosmjs/stargate';
 
-export const getCrossSwapPacketSequence = (tx: IndexedTx) => {
-	const events = [...tx.events].reverse();
-	const fungibleTokenPacket = events.find(
+export const getFungibleTokenPacketResponses = (tx: IndexedTx) => {
+	const fungibleTokenPackets = tx.events.filter(
 		e => e.type === 'fungible_token_packet',
 	);
 
-	if (fungibleTokenPacket) {
-		const success = fungibleTokenPacket.attributes.find(e => e.key === 'success');
+	let success: Attribute | undefined = undefined;
+	let error: Attribute | undefined = undefined;
 
-		if (success) {
-			const responseRaw: SwapContractResponseRaw = JSON.parse(success.value);
+	for (const fungibleTokenPacket of fungibleTokenPackets) {
+		success = fungibleTokenPacket.attributes.find(e => e.key === 'success');
 
-			const response: SwapContractResponse = {
-				contract_result: JSON.parse(
-					fromAscii(fromBase64(responseRaw.contract_result)),
-				),
-				ibc_ack: JSON.parse(fromAscii(fromBase64(responseRaw.ibc_ack))),
-			};
+		const currentError = fungibleTokenPacket.attributes.find(
+			e => e.key === 'error',
+		);
 
-			return {
-				packetSequence: response.contract_result.packet_sequence,
-				error: undefined,
-			};
+		if (currentError) {
+			error = currentError;
 		}
+	}
 
-		const error = fungibleTokenPacket.attributes.find(e => e.key === 'error');
+	return {
+		success,
+		error,
+	};
+};
 
-		if (error) {
-			return {
-				packetSequence: undefined,
-				error: error.value,
-			};
-		}
+export const getCrossSwapPacketSequence = (tx: IndexedTx) => {
+	const { success, error } = getFungibleTokenPacketResponses(tx);
+
+	if (success) {
+		const responseRaw: SwapContractResponseRaw = JSON.parse(success.value);
+
+		const response: SwapContractResponse = {
+			contract_result: JSON.parse(
+				fromAscii(fromBase64(responseRaw.contract_result)),
+			),
+			ibc_ack: JSON.parse(fromAscii(fromBase64(responseRaw.ibc_ack))),
+		};
+
+		return {
+			packetSequence: response.contract_result.packet_sequence,
+			error: undefined,
+		};
+	}
+
+	if (error) {
+		return {
+			packetSequence: undefined,
+			error: error.value,
+		};
 	}
 
 	return {
