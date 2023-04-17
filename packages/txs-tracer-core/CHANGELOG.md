@@ -1,3 +1,12 @@
+# [1.0.0-next.5](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.4...txs-tracer-core-v1.0.0-next.5) (2023-04-17)
+
+
+### Features
+
+* **txs-tracer-core:** :sparkles: add total steps ([ef6bf82](https://github.com/nabla-studio/cosmos-txs-tracer/commit/ef6bf82eeafec15cba2d88a90c5b076a520a9545))
+* **txs-tracer-core:** :sparkles: improve cross swap trace ([a95f50a](https://github.com/nabla-studio/cosmos-txs-tracer/commit/a95f50a8963be567566bb8dcdc259fbfa83840f7))
+* **txs-tracer-core:** :sparkles: improve ibc tracing ([4c5efb3](https://github.com/nabla-studio/cosmos-txs-tracer/commit/4c5efb369a2ded0c275ae23f8999b973eba427ed))
+
 # [1.0.0-next.4](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.3...txs-tracer-core-v1.0.0-next.4) (2023-04-16)
 
 
