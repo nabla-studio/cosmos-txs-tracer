@@ -1,3 +1,10 @@
+# [1.0.0-next.6](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.5...txs-tracer-core-v1.0.0-next.6) (2023-04-18)
+
+
+### Features
+
+* **txs-tracer-core:** :sparkles: add tx hash context ([b3dde44](https://github.com/nabla-studio/cosmos-txs-tracer/commit/b3dde44f29524af0cd9fb7f9f003451964894be9))
+
 # [1.0.0-next.5](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.4...txs-tracer-core-v1.0.0-next.5) (2023-04-17)
 
 
