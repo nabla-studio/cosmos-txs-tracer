@@ -30,6 +30,7 @@ const initialContext: CrossSwapTraceContext = {
 	srcChannel: '',
 	dstChannel: '',
 	query: '',
+	txHash: '',
 };
 
 export const crossSwapTraceMachine = createMachine(
@@ -60,6 +61,9 @@ export const crossSwapTraceMachine = createMachine(
 							},
 							query: (_, event) => {
 								return event.data.query;
+							},
+							txHash: (_, event) => {
+								return event.data.txHash;
 							},
 						}),
 					},
