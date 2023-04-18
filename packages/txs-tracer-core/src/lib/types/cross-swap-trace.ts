@@ -10,6 +10,7 @@ import {
 export type CrossSwapTraceContext = Omit<IBCTraceContext, 'ackTx' | 'txs'> & {
 	M1Tx?: IndexedTx;
 	M2Tx?: IndexedTx;
+	txHash: string;
 	errorMessage?: string;
 	totalSteps: number;
 };
@@ -18,6 +19,10 @@ export type CrossSwapMachineResultErrorPayload =
 	IBCMachineResultErrorPayload & {
 		errorMessage?: string;
 	};
+
+export type CrossSwapTraceEventPayload = IBCTraceEventPayload & {
+	txHash: string;
+};
 
 export const CrossSwapTraceFinalState = {
 	Complete: 'complete',
@@ -36,7 +41,7 @@ export type CrossSwapTraceFinalStates =
 
 export type CrossSwapTraceEvents =
 	| IBCTraceParentEvents
-	| { type: 'TRACE'; data: IBCTraceEventPayload }
+	| { type: 'TRACE'; data: CrossSwapTraceEventPayload }
 	| { type: 'TRACE_M2'; data: IBCTraceAckEventPayload }
 	| { type: 'ON_COMPLETE'; data: IBCTraceAckEventPayload }
 	| { type: 'ON_ERROR'; data: CrossSwapMachineResultErrorPayload }
