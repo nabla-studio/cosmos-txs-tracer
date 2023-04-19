@@ -1,3 +1,11 @@
+# [1.0.0-next.7](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.6...txs-tracer-core-v1.0.0-next.7) (2023-04-19)
+
+
+### Features
+
+* :arrow_up: upgrade cosmos-kit deps ([35ae101](https://github.com/nabla-studio/cosmos-txs-tracer/commit/35ae10193ff338994820057e6853b2908bd20cec))
+* **txs-tracer-core:** :sparkles: improve loading times ([3243ff0](https://github.com/nabla-studio/cosmos-txs-tracer/commit/3243ff0999ef30fbe44c6f20c1ea8f008592617b))
+
 # [1.0.0-next.6](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.5...txs-tracer-core-v1.0.0-next.6) (2023-04-18)
 
 
