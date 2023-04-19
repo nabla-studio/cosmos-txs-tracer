@@ -257,8 +257,8 @@ export const crossSwapTraceMachine = createMachine(
 								return {
 									type: 'TRACE',
 									data: {
-										query: `write_acknowledgement.packet_src_channel='${ctx.dstChannel}' and write_acknowledgement.packet_dst_channel='${ctx.srcChannel}' and write_acknowledgement.packet_sequence=${data.packetSequence}`,
-										websocketUrl: ctx.websocketUrl,
+										query: `acknowledge_packet.packet_src_channel='${ctx.dstChannel}' and acknowledge_packet.packet_dst_channel='${ctx.srcChannel}' and acknowledge_packet.packet_sequence=${data.packetSequence}`,
+										websocketUrl: ctx.dstWebsocketUrl,
 									},
 								};
 							}

@@ -32,19 +32,26 @@ export const getFungibleTokenPacketResponses = (tx: IndexedTx) => {
 export const getCrossSwapPacketSequence = (tx: IndexedTx) => {
 	const { success, error } = getFungibleTokenPacketResponses(tx);
 
-	if (success) {
-		const responseRaw: SwapContractResponseRaw = JSON.parse(success.value);
+	try {
+		if (success) {
+			const responseRaw: SwapContractResponseRaw = JSON.parse(success.value);
 
-		const response: SwapContractResponse = {
-			contract_result: JSON.parse(
-				fromAscii(fromBase64(responseRaw.contract_result)),
-			),
-			ibc_ack: JSON.parse(fromAscii(fromBase64(responseRaw.ibc_ack))),
-		};
+			const response: SwapContractResponse = {
+				contract_result: JSON.parse(
+					fromAscii(fromBase64(responseRaw.contract_result)),
+				),
+				ibc_ack: JSON.parse(fromAscii(fromBase64(responseRaw.ibc_ack))),
+			};
 
+			return {
+				packetSequence: response.contract_result.packet_sequence,
+				error: undefined,
+			};
+		}
+	} catch {
 		return {
-			packetSequence: response.contract_result.packet_sequence,
-			error: undefined,
+			packetSequence: undefined,
+			error: 'Unknown error',
 		};
 	}
 
