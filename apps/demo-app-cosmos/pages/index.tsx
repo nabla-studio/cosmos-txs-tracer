@@ -50,14 +50,14 @@ export function Index() {
 		getRpcEndpoint,
 		sign,
 		getSigningStargateClient,
-	} = useChain('osmosistestnet');
+	} = useChain('osmosis');
 	const {
 		address: junoAddress,
 		connect: connectCosmos,
 		sign: signJuno,
 		getRpcEndpoint: getJunoRpcEndpoint,
 		getSigningStargateClient: getJunoSigningStargateClient,
-	} = useChain('junotestnet');
+	} = useChain('juno');
 	const { status: globalStatus } = useWallet();
 
 	const sendToken = useCallback(async () => {
@@ -76,17 +76,7 @@ export function Index() {
 			fromAddress: address,
 		});
 
-		const fee: StdFee = {
-			amount: [
-				{
-					denom: 'uosmo',
-					amount: '864',
-				},
-			],
-			gas: '86364',
-		};
-
-		const responseSign = await stargateClient.sign(address, [msg], fee, '');
+		const responseSign = await sign([msg]);
 
 		const txBytes = TxRaw.encode(responseSign).finish();
 
@@ -105,7 +95,7 @@ export function Index() {
 				websocketUrl: rpc.replace('https', 'wss'),
 			},
 		});
-	}, [getSigningStargateClient, getRpcEndpoint, sendMachine, address]);
+	}, [getSigningStargateClient, address, sign, getRpcEndpoint, sendMachine]);
 
 	const sendIBCToken = useCallback(async () => {
 		const { transfer } = ibc.applications.transfer.v1.MessageComposer.withTypeUrl;
@@ -115,12 +105,12 @@ export function Index() {
 		const msg = transfer({
 			sourcePort: 'transfer',
 			/**
-			 * Channel 3316 from osmo to juno
+			 * Channel 42 from osmo to juno
 			 */
-			sourceChannel: 'channel-3316',
+			sourceChannel: 'channel-42',
 			token: {
 				denom: 'uosmo',
-				amount: '1000000',
+				amount: '1',
 			},
 			sender: address,
 			receiver: junoAddress,
@@ -141,24 +131,19 @@ export function Index() {
 		const transactionId = toHex(broadcasted.hash).toUpperCase();
 
 		const rpc = await getRpcEndpoint();
+		const junoRPC = await getJunoRpcEndpoint();
 
 		sendIBCMachine({
 			type: 'TRACE',
 			data: {
 				websocketUrl: rpc.replace('https', 'wss'),
+				dstWebsocketUrl: junoRPC.replace('https', 'wss'),
 				query: `tx.hash='${transactionId}'`,
-				srcChannel: 'channel-3316',
-				dstChannel: 'channel-140',
+				srcChannel: 'channel-42',
+				dstChannel: 'channel-0',
 			},
 		});
-	}, [
-		getSigningStargateClient,
-		address,
-		junoAddress,
-		sign,
-		getRpcEndpoint,
-		sendIBCMachine,
-	]);
+	}, [getSigningStargateClient, address, junoAddress, sign, getRpcEndpoint, getJunoRpcEndpoint, sendIBCMachine]);
 
 	const sendIBCSwapToken = useCallback(async () => {
 		const { transfer } = ibc.applications.transfer.v1.MessageComposer.withTypeUrl;
@@ -178,7 +163,7 @@ export function Index() {
 
 		const memo = {
 			wasm: {
-				contract: 'osmo1efakw4was99usxve258p58a5a26f0yt072gvyej5zr4lv5r0hxqqsddqgg',
+				contract: 'osmo195stc2anmc6d9y6z7ms3u3pwskv5c8aql498r945pdw5axxe9xsqn76fs6',
 				msg: {
 					osmosis_swap: {
 						output_denom: 'uosmo',
@@ -195,15 +180,15 @@ export function Index() {
 		const msg = transfer({
 			sourcePort: 'transfer',
 			/**
-			 * Channel 140 from juno to osmo
+			 * Channel 0 from juno to osmo
 			 */
-			sourceChannel: 'channel-140',
+			sourceChannel: 'channel-0',
 			token: {
-				denom: 'ujunox',
-				amount: '1000',
+				denom: 'ujuno',
+				amount: '100000',
 			},
 			sender: junoAddress,
-			receiver: 'osmo1efakw4was99usxve258p58a5a26f0yt072gvyej5zr4lv5r0hxqqsddqgg',
+			receiver: 'osmo195stc2anmc6d9y6z7ms3u3pwskv5c8aql498r945pdw5axxe9xsqn76fs6',
 			timeoutTimestamp: Long.fromNumber(
 				Math.floor(new Date().getTime() / 1000) + 600,
 			).multiply(1_000_000_000),
@@ -221,17 +206,20 @@ export function Index() {
 		const transactionId = toHex(broadcasted.hash).toUpperCase();
 
 		const rpc = await getJunoRpcEndpoint();
+		const osmosisRPC = await getRpcEndpoint();
 
 		sendCrossSwapMachine({
 			type: 'TRACE',
 			data: {
-				websocketUrl: rpc.replace('https', 'wss'),
+				websocketUrl: 'https://rpc-juno.itastakers.com'.replace('https', 'wss'),
+				dstWebsocketUrl: 'https://rpc.osmosis.zone'.replace('https', 'wss'),
 				query: `tx.hash='${transactionId}'`,
-				srcChannel: 'channel-140',
-				dstChannel: 'channel-3316',
+				srcChannel: 'channel-0',
+				dstChannel: 'channel-42',
+				txHash: transactionId,
 			},
 		});
-	}, [getJunoSigningStargateClient, junoAddress, address, signJuno, getJunoRpcEndpoint, sendCrossSwapMachine]);
+	}, [getJunoSigningStargateClient, crossSwapState.matches, junoAddress, address, signJuno, getJunoRpcEndpoint, getRpcEndpoint, sendCrossSwapMachine]);
 
 	/*
 	 * Replace the elements below with your own.
