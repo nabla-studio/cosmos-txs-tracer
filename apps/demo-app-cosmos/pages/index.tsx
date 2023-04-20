@@ -53,11 +53,21 @@ export function Index() {
 	} = useChain('osmosis');
 	const {
 		address: junoAddress,
-		connect: connectCosmos,
+		connect: connectJuno,
 		sign: signJuno,
 		getRpcEndpoint: getJunoRpcEndpoint,
 		getSigningStargateClient: getJunoSigningStargateClient,
 	} = useChain('juno');
+	const {
+		address: cosmosAddress,
+		connect: connectCosmos,
+		sign: signCosmos,
+		getRpcEndpoint: getCosmosRpcEndpoint,
+		getSigningStargateClient: getCosmosSigningStargateClient,
+	} = useChain('cosmoshub');
+	const {
+		address: akashAddress
+	} = useChain('akash');
 	const { status: globalStatus } = useWallet();
 
 	const sendToken = useCallback(async () => {
@@ -92,7 +102,7 @@ export function Index() {
 			type: 'TRACE',
 			data: {
 				query: `tx.hash='${transactionId}'`,
-				websocketUrl: rpc.replace('https', 'wss'),
+				websocketUrl: rpc.toString().replace('https', 'wss'),
 			},
 		});
 	}, [getSigningStargateClient, address, sign, getRpcEndpoint, sendMachine]);
@@ -136,8 +146,8 @@ export function Index() {
 		sendIBCMachine({
 			type: 'TRACE',
 			data: {
-				websocketUrl: rpc.replace('https', 'wss'),
-				dstWebsocketUrl: junoRPC.replace('https', 'wss'),
+				websocketUrl: rpc.toString().replace('https', 'wss'),
+				dstWebsocketUrl: junoRPC.toString().replace('https', 'wss'),
 				query: `tx.hash='${transactionId}'`,
 				srcChannel: 'channel-42',
 				dstChannel: 'channel-0',
@@ -161,34 +171,125 @@ export function Index() {
 			})
 		}
 
-		const memo = {
+		/**
+		 * Native to non-native
+		 */
+		/* const memo = {
 			wasm: {
-				contract: 'osmo195stc2anmc6d9y6z7ms3u3pwskv5c8aql498r945pdw5axxe9xsqn76fs6',
+				contract: 'osmo1uwk8xc6q0s6t5qcpr6rht3sczu6du83xq8pwxjua0hfj5hzcnh3sqxwvxs',
 				msg: {
 					osmosis_swap: {
-						output_denom: 'uosmo',
+						output_denom: 'ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2', //// ATOM on osmosis
 						slippage: { twap: { slippage_percentage: '20', window_seconds: 10 } },
-						receiver: junoAddress,
+						// receiver: junoAddress,
+						receiver: cosmosAddress,
 						on_failed_delivery: {
 							local_recovery_addr: address,
 						},
+						"next_memo": {
+							"forward": {
+									"receiver": junoAddress,  // Final receiver
+									"port": "transfer",
+									"channel": "channel-207"  // Juno's channel on gaia
+							}
+					},
 					},
 				},
 			},
+		}; */
+
+		/**
+		 * Non-native to native
+		 */
+		/* const memo = {
+			forward: {
+				"receiver": "osmo1uwk8xc6q0s6t5qcpr6rht3sczu6du83xq8pwxjua0hfj5hzcnh3sqxwvxs",  // XCS contract
+        "port": "transfer",
+        "channel": "channel-141",  // Osmosis channel on gaia
+				"next": {
+					wasm: {
+						contract: 'osmo1uwk8xc6q0s6t5qcpr6rht3sczu6du83xq8pwxjua0hfj5hzcnh3sqxwvxs',
+						msg: {
+							osmosis_swap: {
+								output_denom: 'ibc/46B44899322F3CD854D2D46DEEF881958467CDD4B3B10086DA49296BBED94BED', // Juno on osmosis
+								slippage: { twap: { slippage_percentage: '20', window_seconds: 10 } },
+								receiver: junoAddress,
+								on_failed_delivery: {
+									local_recovery_addr: address,
+								},
+							},
+						},
+					},
+				}
+			}
+		}; */
+		/**
+		 * Non-native to non-native
+		 */
+		const memo = {
+			forward: {
+				"receiver": "osmo1uwk8xc6q0s6t5qcpr6rht3sczu6du83xq8pwxjua0hfj5hzcnh3sqxwvxs",  // XCS contract
+        "port": "transfer",
+        "channel": "channel-141",  // Osmosis channel on gaia
+				"next": {
+					wasm: {
+						contract: 'osmo1uwk8xc6q0s6t5qcpr6rht3sczu6du83xq8pwxjua0hfj5hzcnh3sqxwvxs',
+						msg: {
+							osmosis_swap: {
+								output_denom: 'ibc/1480B8FD20AD5FCAE81EA87584D269547DD4D436843C1D20F15E00EB64743EF4', // Akash on osmosis
+								slippage: { twap: { slippage_percentage: '20', window_seconds: 10 } },
+								receiver: akashAddress, // Akash address
+								"next_memo": {
+									"forward": {
+										"receiver": junoAddress,  // Final receiver
+										"port": "transfer",
+										"channel": "channel-35"  // Juno's channel on Akash
+									}
+							},
+								on_failed_delivery: {
+									local_recovery_addr: address,
+								},
+							},
+						},
+					},
+				}
+			}
 		};
 
-		const msg = transfer({
+		/**
+		 * Native to non-native
+		 */
+		/* const msg = transfer({
 			sourcePort: 'transfer',
-			/**
-			 * Channel 0 from juno to osmo
-			 */
+			// Channel 0 from juno to osmo
 			sourceChannel: 'channel-0',
 			token: {
 				denom: 'ujuno',
 				amount: '100000',
 			},
 			sender: junoAddress,
-			receiver: 'osmo195stc2anmc6d9y6z7ms3u3pwskv5c8aql498r945pdw5axxe9xsqn76fs6',
+			receiver: 'osmo1uwk8xc6q0s6t5qcpr6rht3sczu6du83xq8pwxjua0hfj5hzcnh3sqxwvxs',
+			timeoutTimestamp: Long.fromNumber(
+				Math.floor(new Date().getTime() / 1000) + 600,
+			).multiply(1_000_000_000),
+			memo: JSON.stringify(memo)
+		}); */
+
+		/**
+		 * Non-native to native
+		 * 
+		 * Swap Atom to JUNO
+		 */
+		const msg = transfer({
+			sourcePort: 'transfer',
+			// Channel 1 from juno to atom
+			sourceChannel: 'channel-1',
+			token: {
+				denom: 'ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9', // Atom on Juno
+				amount: '1',
+			},
+			sender: junoAddress,
+			receiver: cosmosAddress,
 			timeoutTimestamp: Long.fromNumber(
 				Math.floor(new Date().getTime() / 1000) + 600,
 			).multiply(1_000_000_000),
@@ -211,15 +312,18 @@ export function Index() {
 		sendCrossSwapMachine({
 			type: 'TRACE',
 			data: {
-				websocketUrl: 'https://rpc-juno.itastakers.com'.replace('https', 'wss'),
-				dstWebsocketUrl: 'https://rpc.osmosis.zone'.replace('https', 'wss'),
+				websocketUrl: 'https://rpc-juno-ia.cosmosia.notional.ventures'.replace('https', 'wss'),
+				dstWebsocketUrl: 'https://rpc.cosmoshub.strange.love'.replace('https', 'wss'),
+				executorWebsocketUrl: 'https://rpc.osmosis.zone'.replace('https', 'wss'),
 				query: `tx.hash='${transactionId}'`,
-				srcChannel: 'channel-0',
-				dstChannel: 'channel-42',
+				/* srcChannel: 'channel-0', // Channels for Juno to osmosis (Native to native)
+				dstChannel: 'channel-42', */
+				srcChannel: 'channel-1', // Channels for Juno to CosmosHub (Non-native to native) and (Non-native to non-native)
+				dstChannel: 'channel-207',
 				txHash: transactionId,
 			},
 		});
-	}, [getJunoSigningStargateClient, crossSwapState.matches, junoAddress, address, signJuno, getJunoRpcEndpoint, getRpcEndpoint, sendCrossSwapMachine]);
+	}, [getJunoSigningStargateClient, crossSwapState.matches, cosmosAddress, address, junoAddress, signJuno, getJunoRpcEndpoint, getRpcEndpoint, sendCrossSwapMachine]);
 
 	/*
 	 * Replace the elements below with your own.
@@ -244,6 +348,7 @@ export function Index() {
 				<button
 					onClick={async () => {
 						await connect();
+						await connectJuno();
 						await connectCosmos();
 					}}>
 					Connect

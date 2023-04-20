@@ -29,7 +29,7 @@ export const getFungibleTokenPacketResponses = (tx: IndexedTx) => {
 	};
 };
 
-export const getCrossSwapPacketSequence = (tx: IndexedTx) => {
+export const getCrossSwapAckPacketResponse = (tx: IndexedTx) => {
 	const { success, error } = getFungibleTokenPacketResponses(tx);
 
 	try {
@@ -45,12 +45,14 @@ export const getCrossSwapPacketSequence = (tx: IndexedTx) => {
 
 			return {
 				packetSequence: response.contract_result.packet_sequence,
+				response,
 				error: undefined,
 			};
 		}
 	} catch {
 		return {
 			packetSequence: undefined,
+			response: undefined,
 			error: 'Unknown error',
 		};
 	}

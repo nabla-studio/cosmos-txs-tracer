@@ -13,6 +13,10 @@ export type CrossSwapTraceContext = Omit<IBCTraceContext, 'ackTx' | 'txs'> & {
 	txHash: string;
 	errorMessage?: string;
 	totalSteps: number;
+	/**
+	 * The url to the chain websocket that executes the swap contract.
+	 */
+	executorWebsocketUrl: string;
 };
 
 export type CrossSwapMachineResultErrorPayload =
@@ -21,6 +25,10 @@ export type CrossSwapMachineResultErrorPayload =
 	};
 
 export type CrossSwapTraceEventPayload = IBCTraceEventPayload & {
+	/**
+	 * The url to the chain websocket that executes the swap contract.
+	 */
+	executorWebsocketUrl: string;
 	txHash: string;
 };
 

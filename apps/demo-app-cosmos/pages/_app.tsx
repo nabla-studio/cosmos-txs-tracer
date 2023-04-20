@@ -32,11 +32,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         wallets={[
           ...keplrWallets,
         ]}
-        endpointOptions={{
-          'juno': {
-            rpc: ['https://rpc-juno.itastakers.com']
-          }
-        }}
         walletConnectOptions={{
           signClient: {
             projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? '',

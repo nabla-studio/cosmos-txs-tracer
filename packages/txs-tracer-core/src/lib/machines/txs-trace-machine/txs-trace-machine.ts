@@ -72,6 +72,7 @@ export const txTraceMachine = createMachine(
 						if (ctx.tendermintClient) {
 							return streamToPromise<TxEvent>(
 								ctx.tendermintClient.subscribeTx(ctx.query).take(1),
+								ctx.subscribeTimeout + 5_000,
 							);
 						}
 
