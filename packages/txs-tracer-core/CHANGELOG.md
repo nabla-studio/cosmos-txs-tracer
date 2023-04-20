@@ -1,3 +1,12 @@
+# [1.0.0-next.8](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.7...txs-tracer-core-v1.0.0-next.8) (2023-04-20)
+
+
+### Features
+
+* **txs-tracer-core:** :sparkles: add end forward middleware tracing ([262393d](https://github.com/nabla-studio/cosmos-txs-tracer/commit/262393d60ce3517c88f04aedd0fcc8a9382b2423))
+* **txs-tracer-core:** :sparkles: add interchain swap trace ([913b64c](https://github.com/nabla-studio/cosmos-txs-tracer/commit/913b64cf2891a79759aad8dff7508642893c49bc))
+* **txs-tracer-core:** :sparkles: add subscription steam timeout fallback ([f8fda83](https://github.com/nabla-studio/cosmos-txs-tracer/commit/f8fda83f389756d7e10c3c2396b7f5e98061d4cb))
+
 # [1.0.0-next.7](https://github.com/nabla-studio/cosmos-txs-tracer/compare/txs-tracer-core-v1.0.0-next.6...txs-tracer-core-v1.0.0-next.7) (2023-04-19)
 
 
