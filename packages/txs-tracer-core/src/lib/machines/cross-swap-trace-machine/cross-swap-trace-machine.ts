@@ -13,7 +13,7 @@ import { ibcTraceMachine } from '../ibc-trace-machine';
 import { choose } from 'xstate/lib/actions';
 import { txTraceMachine } from '../txs-trace-machine';
 import {
-	getCrossSwapPacketSequence,
+	getCrossSwapAckPacketResponse,
 	getFungibleTokenPacketResponses,
 } from '../../utils';
 
@@ -22,6 +22,7 @@ const initialContext: CrossSwapTraceContext = {
 	connectionTimeout: 10_000,
 	websocketUrl: '',
 	dstWebsocketUrl: '',
+	executorWebsocketUrl: '',
 	loading: false,
 	currentStep: 0,
 	totalSteps: 4,
@@ -29,10 +30,6 @@ const initialContext: CrossSwapTraceContext = {
 	errorMessage: '',
 	srcChannel: '',
 	dstChannel: '',
-	startSrcChannel: undefined,
-	startDstChannel: undefined,
-	endSrcChannel: undefined,
-	endDstChannel: undefined,
 	query: '',
 	txHash: '',
 };
@@ -57,23 +54,14 @@ export const crossSwapTraceMachine = createMachine(
 							dstChannel: (_, event) => {
 								return event.data.dstChannel;
 							},
-							startSrcChannel: (_, event) => {
-								return event.data.startSrcChannel;
-							},
-							startDstChannel: (_, event) => {
-								return event.data.startDstChannel;
-							},
-							endSrcChannel: (_, event) => {
-								return event.data.endSrcChannel;
-							},
-							endDstChannel: (_, event) => {
-								return event.data.endDstChannel;
-							},
 							websocketUrl: (_, event) => {
 								return event.data.websocketUrl;
 							},
 							dstWebsocketUrl: (_, event) => {
 								return event.data.dstWebsocketUrl;
+							},
+							executorWebsocketUrl: (_, event) => {
+								return event.data.executorWebsocketUrl;
 							},
 							query: (_, event) => {
 								return event.data.query;
@@ -106,7 +94,7 @@ export const crossSwapTraceMachine = createMachine(
 									return (
 										event.data.state === IBCTraceFinalState.Complete &&
 										event.data.ackTx !== undefined &&
-										getCrossSwapPacketSequence(event.data.ackTx).packetSequence !==
+										getCrossSwapAckPacketResponse(event.data.ackTx).packetSequence !==
 											undefined
 									);
 								},
@@ -126,14 +114,14 @@ export const crossSwapTraceMachine = createMachine(
 									return (
 										event.data.state === IBCTraceFinalState.Complete &&
 										event.data.ackTx !== undefined &&
-										getCrossSwapPacketSequence(event.data.ackTx).error !== undefined
+										getCrossSwapAckPacketResponse(event.data.ackTx).error !== undefined
 									);
 								},
 								actions: raise((_, event) => {
 									let errorMessage: string | undefined = '';
 
 									if (event.data.ackTx) {
-										const data = getCrossSwapPacketSequence(event.data.ackTx);
+										const data = getCrossSwapAckPacketResponse(event.data.ackTx);
 
 										errorMessage = data.error;
 									}
@@ -267,26 +255,20 @@ export const crossSwapTraceMachine = createMachine(
 						const tx = ctx.M1Tx;
 
 						if (tx) {
-							const data = getCrossSwapPacketSequence(tx);
+							const data = getCrossSwapAckPacketResponse(tx);
 
-							if (data.packetSequence) {
+							if (data.response) {
 								/**
-								 * If endSrcChannel and endDstChannel are configured, it means
-								 * we need to trace the transaction from Osmosis to
-								 * the forwarder chain (For example Cosmos Hub)
+								 * The channel between Osmosis and the destination chain
 								 */
-								const srcChannel = ctx.endSrcChannel
-									? ctx.endSrcChannel
-									: ctx.dstChannel;
-								const dstChannel = ctx.endDstChannel
-									? ctx.endDstChannel
-									: ctx.srcChannel;
+								const srcChannel = data.response.contract_result.channel_id;
+								const packetSequence = data.response.contract_result.packet_sequence;
 
 								return {
 									type: 'TRACE',
 									data: {
-										query: `acknowledge_packet.packet_src_channel='${srcChannel}' and acknowledge_packet.packet_dst_channel='${dstChannel}' and acknowledge_packet.packet_sequence=${data.packetSequence}`,
-										websocketUrl: ctx.dstWebsocketUrl,
+										query: `acknowledge_packet.packet_src_channel='${srcChannel}' and acknowledge_packet.packet_sequence=${packetSequence}`,
+										websocketUrl: ctx.executorWebsocketUrl,
 									},
 								};
 							}
