@@ -29,6 +29,10 @@ const initialContext: CrossSwapTraceContext = {
 	errorMessage: '',
 	srcChannel: '',
 	dstChannel: '',
+	startSrcChannel: undefined,
+	startDstChannel: undefined,
+	endSrcChannel: undefined,
+	endDstChannel: undefined,
 	query: '',
 	txHash: '',
 };
@@ -52,6 +56,18 @@ export const crossSwapTraceMachine = createMachine(
 							},
 							dstChannel: (_, event) => {
 								return event.data.dstChannel;
+							},
+							startSrcChannel: (_, event) => {
+								return event.data.startSrcChannel;
+							},
+							startDstChannel: (_, event) => {
+								return event.data.startDstChannel;
+							},
+							endSrcChannel: (_, event) => {
+								return event.data.endSrcChannel;
+							},
+							endDstChannel: (_, event) => {
+								return event.data.endDstChannel;
 							},
 							websocketUrl: (_, event) => {
 								return event.data.websocketUrl;
@@ -254,10 +270,22 @@ export const crossSwapTraceMachine = createMachine(
 							const data = getCrossSwapPacketSequence(tx);
 
 							if (data.packetSequence) {
+								/**
+								 * If endSrcChannel and endDstChannel are configured, it means
+								 * we need to trace the transaction from Osmosis to
+								 * the forwarder chain (For example Cosmos Hub)
+								 */
+								const srcChannel = ctx.endSrcChannel
+									? ctx.endSrcChannel
+									: ctx.dstChannel;
+								const dstChannel = ctx.endDstChannel
+									? ctx.endDstChannel
+									: ctx.srcChannel;
+
 								return {
 									type: 'TRACE',
 									data: {
-										query: `acknowledge_packet.packet_src_channel='${ctx.dstChannel}' and acknowledge_packet.packet_dst_channel='${ctx.srcChannel}' and acknowledge_packet.packet_sequence=${data.packetSequence}`,
+										query: `acknowledge_packet.packet_src_channel='${srcChannel}' and acknowledge_packet.packet_dst_channel='${dstChannel}' and acknowledge_packet.packet_sequence=${data.packetSequence}`,
 										websocketUrl: ctx.dstWebsocketUrl,
 									},
 								};

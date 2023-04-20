@@ -13,6 +13,27 @@ export type CrossSwapTraceContext = Omit<IBCTraceContext, 'ackTx' | 'txs'> & {
 	txHash: string;
 	errorMessage?: string;
 	totalSteps: number;
+	/**
+	 * Data definitions for interchain swaps
+	 */
+	/**
+	 * Channel related to token transfer using forward middleware on start.
+	 * for example if I swap atom to osmo (And the swap is performed on Juno Chain),
+	 * I'll set it to the channel between the Osmosis chain and the Cosmos Hub chain.
+	 * endSrcChannel: channel-1
+	 * endDstChannel: channel-207
+	 */
+	startSrcChannel?: string;
+	startDstChannel?: string;
+	/**
+	 * Channel related to token transfer using forward middleware
+	 * for example if I swap osmo to atom (And the swap is performed on Juno Chain),
+	 * I'll set it to the channel between the Osmosis chain and the Cosmos Hub chain.
+	 * endSrcChannel: channel-0
+	 * endDstChannel: channel-141
+	 */
+	endSrcChannel?: string;
+	endDstChannel?: string;
 };
 
 export type CrossSwapMachineResultErrorPayload =
@@ -22,6 +43,10 @@ export type CrossSwapMachineResultErrorPayload =
 
 export type CrossSwapTraceEventPayload = IBCTraceEventPayload & {
 	txHash: string;
+	startSrcChannel?: string;
+	startDstChannel?: string;
+	endSrcChannel?: string;
+	endDstChannel?: string;
 };
 
 export const CrossSwapTraceFinalState = {
