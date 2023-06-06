@@ -5,17 +5,16 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nrwl/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
       "options": {
+        "project": "packages/txs-tracer-core/package.json",
         "outputPath": "dist/packages/txs-tracer-core",
         "main": "packages/txs-tracer-core/src/index.ts",
         "tsConfig": "packages/txs-tracer-core/tsconfig.lib.json",
-        "assets": [
-          "packages/txs-tracer-core/*.md"
-        ]
+        "compiler": "babel",
+        "external": ["typescript"],
+        "format": ["cjs", "esm"]
       }
     },
     "publish": {
@@ -54,7 +53,9 @@
         "github": true,
         "changelog": true,
         "npm": true,
-        "tagFormat": "txs-tracer-core-v${VERSION}"
+        "tagFormat": "txs-tracer-core-v${VERSION}",
+        "outputPath": "dist/packages/txs-tracer-core",
+        "buildTarget": "${PROJECT_NAME}:build"
       }
     }
   },
