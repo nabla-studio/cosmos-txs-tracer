@@ -43,7 +43,7 @@
     "react-dom": "18.2.0",
     "react-router-dom": "6.8.1",
     "tslib": "^2.3.0",
-    "webpack": "^5.75.0",
+    "webpack": "^5.76.0",
     "xstate": "^4.37.0",
     "xstream": "^11.14.0"
   },
